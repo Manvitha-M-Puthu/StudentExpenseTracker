@@ -1,0 +1,144 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image:url('./piggy.jpg');
+    background-repeat:no-repeat;
+    -webkit-background-size:cover;
+    -moz-background-size:cover;
+    -o-background-size:cover;
+    background-size:cover;
+    background-position:center;
+    padding: 20px;
+}
+
+.login-box {
+    background: white;
+    padding: 40px ;
+    padding-top: 50px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box h2 {
+    margin: 0 0 0 0;
+    color: #2d3748;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #718096;
+    margin-bottom: 30px;
+    font-size: 18px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+}
+
+.button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background-color: white;
+}
+
+.form-group input::placeholder {
+    color: #a0aec0;
+}
+
+
+.login-button:hover {
+    transform: translateY(-1px);
+}
+
+.login-button:active {
+    transform: translateY(0);
+} 
+
+@media screen and (max-width: 768px) {
+    .login-box {
+        padding: 30px;
+        max-width: 350px;
+    }
+}
+
+.btn {
+
+    margin: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #667eea;
+    color: white;
+    padding: 12px 40px;
+  
+    border-radius: 6px;
+    max-width: 150px;
+    font-weight: 500;
+ 
+  }
+  .btn-border-reveal {
+    background-color: transparent;
+    color: #9b59b6;
+    border: 2px solid #9b59b6;
+    position: relative;
+  }
+  
+  .btn-border-reveal::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #9b59b6;
+    transition: width 0.3s ease;
+    z-index: -1;
+  }
+  
+  .btn-border-reveal:hover::after {
+    width: 100%;
+  }
+  
+  .btn-border-reveal:hover {
+    color: rgb(255, 255, 255);
+    z-index:5;
+  }  
