@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './components/Login';
-import Register from './components/Register';
-import Wallet from './components/Wallet';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Wallet from './pages/Wallet';
 
 function App() {
     return (
