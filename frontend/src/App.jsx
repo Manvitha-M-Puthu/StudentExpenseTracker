@@ -5,11 +5,11 @@ import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Wallet from './pages/Wallet';
 
-const PrivateRoute = ({ children }) => {
-    const { currentUser } = useAuth(); // Use `currentUser`, not `user`
+// const PrivateRoute = ({ children }) => {
+//     const { currentUser } = useAuth(); // Use `currentUser`, not `user`
 
-    return currentUser ? children : <Navigate to="/login" />;
-};
+//     return currentUser ? children : <Navigate to="/login" />;
+// };
 
 function App() {
     return (
@@ -20,9 +20,9 @@ function App() {
                 <Route
                     path="/"
                     element={
-                        <PrivateRoute>
+                        // <PrivateRoute>
                             <Wallet />
-                        </PrivateRoute>
+                        // </PrivateRoute>
                     }
                 />
             </Routes>

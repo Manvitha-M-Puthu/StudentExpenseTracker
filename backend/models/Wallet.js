@@ -32,6 +32,6 @@ export const findWalletByUserId = async (userId) => {
 
         return results.length > 0 ? results[0] : null;
     } catch (err) {
-        throw err; // Ensure the error is properly handled in the calling function
+        throw err; 
     }
 };
