@@ -32,10 +32,10 @@ const router = createBrowserRouter([
     {path:"/register",element:<Register />},
     {path:"/",element:<Layout />,children:[
         {path:"/",element:<PrivateRoute><Wallet /></PrivateRoute>},
-        {path:"/budget",element:<Budget />},
-        {path:"/transactions",element:<Transaction />},
-        {path:"/savings",element:<Savings />},
-        {path:"/profile",element:<Profile />},
+        {path:"/budget",element:<PrivateRoute><Budget /></PrivateRoute>},
+        {path:"/transaction",element:<PrivateRoute><Transaction /></PrivateRoute>},
+        {path:"/savings",element:<PrivateRoute><Savings /></PrivateRoute>},
+        {path:"/profile",element:<PrivateRoute><Profile /></PrivateRoute>},
     ]},
 ]);
 

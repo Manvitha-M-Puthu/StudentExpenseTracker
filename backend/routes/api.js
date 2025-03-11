@@ -1,12 +1,12 @@
 import express from "express";
 import {
-  createBudgetHandler,
-  getBudgetHandler,
-} from "../controllers/budgetController.js";
-import {
   createCategoryHandler,
   getCategoriesHandler,
 } from "../controllers/categoryController.js";
+import {
+  createBudgetHandler,
+  getBudgetHandler,
+} from "../controllers/budgetController.js";
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ router.post("/categories", createCategoryHandler);
 router.get("/categories/:userId", getCategoriesHandler);
 
 // Budget routes
-router.post("/budget", createBudgetHandler);
-router.get("/budget/:userId", getBudgetHandler);
+router.post("/budgets", createBudgetHandler);
+router.get("/budgets/:userId", getBudgetHandler);
 
 export default router;

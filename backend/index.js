@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
 import walletRoutes from './routes/walletRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
+import categoryRoutes from "./routes/categoryRoutes.js";
 import transactionRoutes from './routes/transactionRoutes.js';
 import debtRoutes from './routes/debtRoutes.js';
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 app.use('/auth', authRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api', budgetRoutes);
+app.use("/api", categoryRoutes);
 app.use('/api', transactionRoutes);
 app.use('/api', debtRoutes);
 

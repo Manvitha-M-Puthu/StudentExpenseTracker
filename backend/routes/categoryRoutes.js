@@ -1,9 +1,5 @@
 import express from "express";
 import {
-  createBudgetHandler,
-  getBudgetHandler,
-} from "../controllers/budgetController.js";
-import {
   createCategoryHandler,
   getCategoriesHandler,
 } from "../controllers/categoryController.js";
@@ -13,9 +9,5 @@ const router = express.Router();
 // Category routes
 router.post("/categories", createCategoryHandler);
 router.get("/categories/:userId", getCategoriesHandler);
-
-// Budget routes
-router.post("/budget", createBudgetHandler);
-router.get("/budget/:userId", getBudgetHandler);
 
 export default router;
