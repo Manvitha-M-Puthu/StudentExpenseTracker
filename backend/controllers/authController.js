@@ -2,16 +2,15 @@ import db from "../utils/db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const register = (req, res) => {
-    // CHECK IF USER EXISTS
-    const q = "SELECT * FROM users WHERE email = ? AND name = ?";
+export const register = async (req, res) => {
+    try {
+        console.log("Register request received");
 
-    db.query(q, [req.body.email, req.body.name], (err, data) => {
-        if (err) {
-            console.error("Database error:", err);
-            return res.status(500).json({ error: "Database error", details: err });
-        }
-        if (data.length) {
+        // CHECK IF USER EXISTS (More efficient way)
+        const checkUserQuery = "SELECT COUNT(*) AS count FROM users WHERE email = ?";
+        const [rows] = await db.execute(checkUserQuery, [req.body.email]);
+
+        if (rows[0].count > 0) {
             return res.status(400).json({ message: "User already exists" });
         }
 
@@ -20,40 +19,49 @@ export const register = (req, res) => {
         const hash = bcrypt.hashSync(req.body.password, salt);
 
         // INSERT NEW USER
-        const q = "INSERT INTO users (`name`, `email`, `password`,`phone_no`) VALUES (?,?,?,?)";
+        const insertUserQuery = "INSERT INTO users (`name`, `email`, `password`, `phone_no`) VALUES (?, ?, ?, ?)";
         const values = [req.body.name, req.body.email, hash, req.body.phone_no];
 
-        db.query(q, values, (err, data) => {
-            if (err) {
-                console.error("Error inserting user:", err);
-                return res.status(500).json({ error: "Database error", details: err });
-            }
-            return res.status(201).json({ message: "User has been created successfully" });
-        });
-    });
+        await db.execute(insertUserQuery, values);
+
+        return res.status(201).json({ message: "User has been created successfully" });
+
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Database error", details: error.message });
+    }
 };
 
-export const login = (req, res) => {
-    //CHECK IF USER EXISTS
-    const q = "SELECT * FROM users WHERE name=?";
 
-    db.query(q,[req.body.name],(err,data)=>{
-        if(err) return res.json(err);
-        if(data.length===0) return res.status(404).json("User not found");
+export const login = async (req, res) => {
+    try {
+        const q = "SELECT user_id, name, email, password FROM users WHERE name = ?";
+        const [data] = await db.execute(q, [req.body.name]);
 
-        //CHECK PASSWORD
-        const isPasswordCorrect = bcrypt.compareSync(req.body.password,data[0].password);
+        if (data.length === 0) return res.status(404).json("User not found");
+        const user = data[0];
+        // Check Password
+        console.log(req.body);
+        const isPasswordCorrect = bcrypt.compareSync(req.body.password, user.password);
+        if (!isPasswordCorrect) return res.status(400).json("Wrong username or password");
 
-        if(!isPasswordCorrect) return res.status(400).json("Wrong username or password");
+        // Generate JWT Token
+        const token = jwt.sign({ id: data[0].user_id }, "jwtKey");
 
-        const token = jwt.sign({id:data[0].id},"jwtKey");
-        const {password,...other}=data[0];
-        res.cookie("access_token",token,{
-            httpOnly:true
-        }).status(200).json(other);
-    
-    })
+        // Exclude password before sending user details
+        const { password, ...userData } = data[0];
+
+        // Send token as a cookie & return user data
+        res.cookie("access_token", token, { httpOnly: true })
+           .status(200).json(userData); // ✅ Send user data
+
+    } catch (err) {
+        console.error("Error:", err);
+        res.status(500).json("Internal Server Error");
+    }
 };
+
+
 
 export const logout = (req, res) => {
     res.clearCookie("access_token",{

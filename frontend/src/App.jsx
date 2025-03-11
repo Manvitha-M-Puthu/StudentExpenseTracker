@@ -1,8 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './pages/Login/Login.jsx';
-import Register from './pages/Register/Register.jsx';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { useAuth } from './context/authContext'; // Correct import
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
 import Wallet from './pages/Wallet';
+
+const PrivateRoute = ({ children }) => {
+    const { currentUser } = useAuth(); // Use `currentUser`, not `user`
+
+    return currentUser ? children : <Navigate to="/login" />;
+};
 
 function App() {
     return (
@@ -10,7 +17,14 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/wallet" element={<Wallet />} />
+                <Route
+                    path="/"
+                    element={
+                        <PrivateRoute>
+                            <Wallet />
+                        </PrivateRoute>
+                    }
+                />
             </Routes>
         </Router>
     );

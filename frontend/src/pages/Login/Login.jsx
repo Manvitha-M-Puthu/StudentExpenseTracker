@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 // import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from "../../context/authContext";
 import './login.css';
 const Login = () => {
     const [inputs,setInputs]=useState({
         name:"",
-        email:"",
+        password:"",
     })
 
     const [err,setError] = useState(null);
@@ -24,9 +24,8 @@ const Login = () => {
         e.preventDefault();
         try{
             await login(inputs);
-            navigate("/");
         }catch(err){
-            setError(err.response.data);
+            setError(err.response?.data||"Something Went Wrong!");
         }
     }
 
@@ -41,10 +40,9 @@ const Login = () => {
                 </div>
                 <div className="form-group">
                 <input type="password" placeholder="Password" name="password" onChange={handleChange} required /> </div>
-               
                 <div className="button">
                 <button type="submit" onClick={handleSubmit} className="btn btn-border-reveal login-button">Log In</button>
-          
+                <p>Not a user? <span><Link to="/register">Register</Link></span></p>
                 </div>
                 {err && <p>{err.message || err}</p>}
                 

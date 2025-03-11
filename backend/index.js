@@ -15,15 +15,15 @@ app.use((req,res,next)=>{
 })
 
 app.use(cors({
-    origin: "http://localhost:5173", // Allow frontend URL
-    credentials: true // Allow cookies (if needed)
+    origin: "http://localhost:5173", 
+    credentials: true 
 }));
 
 app.use(express.json());
 app.use(cookieParser());
 
 app.use('/auth', authRoutes);
-app.use('/api', walletRoutes);
+app.use('/api/wallet', walletRoutes);
 app.use('/api', budgetRoutes);
 app.use('/api', transactionRoutes);
 app.use('/api', debtRoutes);

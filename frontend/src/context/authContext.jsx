@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import axios from "axios";
 
 export const AuthContext = createContext();
@@ -9,16 +9,37 @@ export const AuthContextProvider = ({ children }) => {
     );
 
     const login = async (inputs) => {
-        const res = await axios.post("http://localhost:8800/auth/login", inputs);
+        try{const res = await axios.post("http://localhost:8800/auth/login", inputs,{
+            withCredentials:true
+        });
         setCurrentUser(res.data);
         localStorage.setItem("user", JSON.stringify(res.data));
+        }catch(error){
+            console.error("Login Error: ",error);
+            throw error;
+        }
     };
 
     const logout = async () => {
-        await axios.post("http://localhost:8800/auth/logout");
-        setCurrentUser(null);
-        localStorage.removeItem("user");
+
+        try{
+            await axios.post("http://localhost:8800/auth/logout",{},{
+                withCredentials:true
+        });
+            setCurrentUser(null);
+            localStorage.removeItem("user");
+        }catch(error){
+            console.error("Logout error: ",error);
+            throw error;
+        }
+       
     };
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (user) {
+            setCurrentUser(user);
+        }
+    }, []);
 
     useEffect(() => {
         localStorage.setItem("user", JSON.stringify(currentUser));
@@ -30,3 +51,11 @@ export const AuthContextProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+
+export const useAuth = () =>{
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthContextProvider");
+    }
+    return context;
+}

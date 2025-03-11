@@ -1,14 +1,42 @@
-import pool from '../utils/db.js';
+import db from '../utils/db.js';
 
-export const createWallet = async ({ userId, balance }) => {
-    const [result] = await pool.query(
-        'INSERT INTO WALLET (USER_ID, BALANCE) VALUES (?, ?)',
-        [userId, balance]
-    );
-    return result.insertId;
+export const createWallet = async ({ userId, initial_balance }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Check if wallet already exists
+            const existingWallet = await findWalletByUserId(userId);
+            if (existingWallet) {
+                return resolve(existingWallet);
+            }
+
+            // Insert new wallet
+            const q = 'INSERT INTO wallet (user_id, initial_balance, current_balance) VALUES (?, ?, ?)';
+            db.execute(q, [userId, initial_balance, initial_balance], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ wallet_id: result.insertId, user_id: userId, initial_balance, current_balance: initial_balance });
+                }
+            });
+        } catch (error) {
+            reject(error);
+        }
+    });
 };
 
 export const findWalletByUserId = async (userId) => {
-    const [rows] = await pool.query('SELECT * FROM WALLET WHERE USER_ID = ?', [userId]);
-    return rows[0];
+    try {
+        const q = 'SELECT * FROM wallet WHERE user_id = ?';
+
+        console.log("🔍 Executing SQL Query:", q, "with userId:", userId);
+
+        const [results] = await db.execute(q, [userId]);
+
+        console.log("✅ Query Result:", results);
+
+        return results.length > 0 ? results[0] : null;
+    } catch (err) {
+        console.error("❌ Database Error:", err);
+        throw err; // Ensure the error is properly handled in the calling function
+    }
 };
