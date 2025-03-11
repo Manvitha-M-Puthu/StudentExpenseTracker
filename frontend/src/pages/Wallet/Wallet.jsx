@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { AuthContext, useAuth } from '../context/authContext';
+import { AuthContext, useAuth } from "../../context/authContext";
 import { useNavigate } from 'react-router-dom';
 
 const Wallet = () => {
@@ -58,15 +58,6 @@ const Wallet = () => {
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate('/login');
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
-    };
-
     if (!currentUser) {
         return (
             <div>
@@ -98,7 +89,6 @@ const Wallet = () => {
                     <button onClick={handleCreateWallet}>Create Wallet</button>
                 </>
             )}
-            <button onClick={handleLogout}>Logout</button>
         </div>
     );
 };

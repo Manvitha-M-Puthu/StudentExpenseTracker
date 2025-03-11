@@ -34,9 +34,9 @@ const Login = () => {
     return (
         <div className="login-container">
         <div className="login-box">
-        <div class="split-text-container">
-    <span class="text-part left">Welcome</span>
-    <span class="text-part right">&nbsp;Back!</span>
+        <div className="split-text-container">
+    <span className="text-part left">Welcome</span>
+    <span className="text-part right">&nbsp;Back!</span>
 </div>
             <p className="subtitle">Please sign in to your account</p>
             <form onSubmit={handleSubmit} className="login-form">
