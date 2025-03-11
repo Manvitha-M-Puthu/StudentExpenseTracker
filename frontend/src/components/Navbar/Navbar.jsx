@@ -1,13 +1,13 @@
 // Navbar.jsx
 import React, { useContext, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './navbar-css.css';
 import { AuthContext } from '../../context/authContext';
 
 const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const navigate = useNavigate();
   // Function to check if a nav item is active
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';
@@ -25,7 +25,7 @@ const Navbar = () => {
   const handleLogout = async() =>{
     try{
         await logout();
-        res.status(200).json("user successfully Logged out");
+        navigate("/login");
     }catch(err){
         res.status(500).json("Something went wrong",err);
     }

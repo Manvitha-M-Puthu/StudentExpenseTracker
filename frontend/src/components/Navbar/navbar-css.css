@@ -184,8 +184,9 @@
   .navbar-links {
     position: fixed;
     top: 0;
-    right: -280px;
-    width: 280px;
+    right: -100%;  /* Change from -280px to -100% */
+    width: 80%;    /* Change from fixed 280px to 80% of viewport */
+    max-width: 280px; /* Add max-width to prevent it from getting too wide */
     height: 100vh;
     background-color: white;
     flex-direction: column;
@@ -194,6 +195,7 @@
     z-index: 100;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     transition: right 0.3s ease;
+    overflow-y: auto; /* Add scrolling if content is too tall */
   }
   
   .navbar-links.mobile-open {
@@ -213,6 +215,15 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  /* Show overlay when menu is open */
+  .mobile-menu-open .mobile-menu-overlay {
+    opacity: 1;
+    visibility: visible;
   }
   
   .nav-item {
@@ -269,5 +280,10 @@
   .avatar {
     width: 35px;
     height: 35px;
+  }
+  
+  .navbar-links {
+    width: 85%; /* Slightly wider on very small screens */
+    max-width: 250px;
   }
 }

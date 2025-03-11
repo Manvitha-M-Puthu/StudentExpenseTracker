@@ -33,7 +33,7 @@ const Footer = () => {
                 <span className={`toggle-icon ${expandedColumn === 'customers' ? 'open' : ''}`}>+</span>
               </h4>
               <ul className={expandedColumn === 'customers' ? 'expanded' : ''}>
-                <li><Link to="/transaction">Transactions</Link></li>
+                <li><Link to="/transactions">Transactions</Link></li>
                 <li><Link to="/savings">Savings</Link></li>
               </ul>
             </div>

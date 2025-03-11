@@ -33,7 +33,7 @@ const router = createBrowserRouter([
     {path:"/",element:<Layout />,children:[
         {path:"/",element:<PrivateRoute><Wallet /></PrivateRoute>},
         {path:"/budget",element:<Budget />},
-        {path:"/transaction",element:<Transaction />},
+        {path:"/transactions",element:<Transaction />},
         {path:"/savings",element:<Savings />},
         {path:"/profile",element:<Profile />},
     ]},
