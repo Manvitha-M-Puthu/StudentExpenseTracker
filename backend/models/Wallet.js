@@ -28,15 +28,10 @@ export const findWalletByUserId = async (userId) => {
     try {
         const q = 'SELECT * FROM wallet WHERE user_id = ?';
 
-        console.log("🔍 Executing SQL Query:", q, "with userId:", userId);
-
         const [results] = await db.execute(q, [userId]);
-
-        console.log("✅ Query Result:", results);
 
         return results.length > 0 ? results[0] : null;
     } catch (err) {
-        console.error("❌ Database Error:", err);
         throw err; // Ensure the error is properly handled in the calling function
     }
 };

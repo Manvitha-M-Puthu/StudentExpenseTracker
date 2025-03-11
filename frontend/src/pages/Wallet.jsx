@@ -20,7 +20,6 @@ const Wallet = () => {
 
         const fetchWallet = async () => {
             try {
-                console.log("Fetching wallet for user:", currentUser.user_id);
                 const response = await axios.get(
                     `http://localhost:8800/api/wallet/${currentUser.user_id}`,
                     { withCredentials: true }

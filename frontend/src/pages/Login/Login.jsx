@@ -5,6 +5,7 @@ import { useContext } from 'react';
 import { AuthContext } from "../../context/authContext";
 import './login.css';
 const Login = () => {
+
     const [inputs,setInputs]=useState({
         name:"",
         password:"",
@@ -24,6 +25,7 @@ const Login = () => {
         e.preventDefault();
         try{
             await login(inputs);
+            navigate("/");
         }catch(err){
             setError(err.response?.data||"Something Went Wrong!");
         }

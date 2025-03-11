@@ -40,8 +40,7 @@ export const login = async (req, res) => {
 
         if (data.length === 0) return res.status(404).json("User not found");
         const user = data[0];
-        // Check Password
-        console.log(req.body);
+        
         const isPasswordCorrect = bcrypt.compareSync(req.body.password, user.password);
         if (!isPasswordCorrect) return res.status(400).json("Wrong username or password");
 
