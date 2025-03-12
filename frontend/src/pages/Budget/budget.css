@@ -1,45 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+body{
+    background-color:  #74c69d;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight:200;
+    font-style: normal;
+}
+
+
+
 .budget-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+   
 }
 
 .budget-header {
     text-align: center;
-    margin-bottom: 3rem;
+   
+    font-size: 1.5rem;
+    color: #1b4332;
+    margin-bottom: 2rem;
 }
 
-.budget-header h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin-bottom: 1rem;
-}
+
 
 .budget-section {
+   
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 2rem;
     margin-bottom: 2rem;
+    background-color:#d8f3dc;
 }
 
 .budget-section h2 {
+    text-align: center;
     color: #2c3e50;
     margin-bottom: 1.5rem;
     font-size: 1.8rem;
 }
 
+.create-category{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .form-group {
     margin-bottom: 1.5rem;
+  
 }
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #34495e;
-    font-weight: 500;
-}
-
 .form-control {
     width: 100%;
     padding: 0.75rem;
@@ -85,7 +99,7 @@
     background-color: #27ae60;
 }
 
-.alert {
+/* .alert {
     padding: 1rem;
     border-radius: 6px;
     margin-bottom: 1rem;
@@ -101,26 +115,193 @@
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
+} */
+
+.active-budgets{
+    display: flex;
+    flex-direction: column;
+   
 }
 
+.categories{
+    text-align: center;
+    font-size: 1.5rem;
+    color:#01497c;
+}
 .categories-list {
     margin-top: 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1rem;
+    
 }
-
 .category-card {
     background: #f8f9fa;
     padding: 1rem;
     border-radius: 8px;
     border: 1px solid #dee2e6;
+    background-color: #ecb5e1;
 }
 
 .category-card h3 {
     margin: 0;
     color: #2c3e50;
     font-size: 1.2rem;
+}
+
+.budget-card {
+  
+    border-radius: 8px;
+    padding: 20px 40px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    background-color: #a9d6e5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 1rem;
+    
+}
+
+.budget-card h3 {
+    text-align: center;
+   text-transform:capitalize;
+    color: #2c3e50;
+    font-size: 1.5rem;
+}
+
+.content{
+    display: flex;
+    align-items: center;
+    gap:10px;
+    font-weight:300;
+}
+.content img{
+    height: 30px;
+    width: 30px;
+
+}
+.edit-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+    background-color: #45a049;
+}
+
+
+.budget-card-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+} 
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-buttons button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.modal-buttons button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.modal-buttons button[type="button"] {
+    background-color: #f44336;
+    color: white;
+}
+
+.modal-buttons button[type="button"]:hover {
+    background-color: #da190b;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -135,4 +316,31 @@
     .budget-header h1 {
         font-size: 2rem;
     }
-} 
+}
+
+.setBudget-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-group select{
+    height: 100%;
+    width:115%;
+    border: none;
+    appearance: none;
+    padding: 10px 40px;
+}
+.budget-btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.budget-card.food, .category-card.food {
+    background-color: orange;
+}
+
+.budget-card.travel, .category-card.travel {
+    background-color: purple;
+}

@@ -68,8 +68,8 @@ export const createBudget = async ({
 
     // Insert the budget
     const [result] = await db.query(
-      "INSERT INTO budget (user_id, category_id, amount, start_date, end_date) VALUES (?, ?, ?, ?, ?)",
-      [userId, categoryId, amount, startDate, endDate]
+      "INSERT INTO budget (user_id, category_id, amount, remaining_amount, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)",
+      [userId, categoryId, amount, amount, startDate, endDate]
     );
 
     if (!result || !result.insertId) {
@@ -94,7 +94,8 @@ export const findBudgetByUserId = async (userId) => {
     const [rows] = await db.query(
       `SELECT b.*, c.category_name,
               DATE_FORMAT(b.start_date, '%Y-%m-%d') as start_date,
-              DATE_FORMAT(b.end_date, '%Y-%m-%d') as end_date
+              DATE_FORMAT(b.end_date, '%Y-%m-%d') as end_date,
+              COALESCE(b.remaining_amount, b.amount) as remaining_amount
        FROM budget b 
        JOIN categories c ON b.category_id = c.category_id 
        WHERE b.user_id = ? 
@@ -105,6 +106,96 @@ export const findBudgetByUserId = async (userId) => {
     return rows || [];
   } catch (error) {
     console.error("Error in findBudgetByUserId:", error);
+    throw error;
+  }
+};
+
+export const updateBudget = async ({
+  budgetId,
+  userId,
+  amount,
+  startDate,
+  endDate,
+}) => {
+  try {
+    // Input validation
+    if (!budgetId || !userId || !amount || !startDate || !endDate) {
+      throw new Error("Missing required fields");
+    }
+
+    // Validate dates
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new Error("Invalid date format");
+    }
+
+    if (end < start) {
+      throw new Error("End date must be after start date");
+    }
+
+    // Check if budget exists and belongs to user
+    const [existing] = await db.query(
+      "SELECT * FROM budget WHERE budget_id = ? AND user_id = ?",
+      [budgetId, userId]
+    );
+
+    if (!existing || existing.length === 0) {
+      throw new Error("Budget not found or does not belong to user");
+    }
+
+    // Calculate the difference between old and new amounts
+    const oldAmount = existing[0].amount;
+    const amountDifference = parseFloat(amount) - parseFloat(oldAmount);
+
+    // Update the budget
+    const [result] = await db.query(
+      "UPDATE budget SET amount = ?, remaining_amount = remaining_amount + ?, start_date = ?, end_date = ? WHERE budget_id = ? AND user_id = ?",
+      [amount, amountDifference, startDate, endDate, budgetId, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      throw new Error("Failed to update budget");
+    }
+
+    return budgetId;
+  } catch (error) {
+    console.error("Error in updateBudget:", error);
+    throw error;
+  }
+};
+
+export const deleteBudget = async ({ budgetId, userId }) => {
+  try {
+    // Input validation
+    if (!budgetId || !userId) {
+      throw new Error("Budget ID and User ID are required");
+    }
+
+    // Check if budget exists and belongs to user
+    const [existing] = await db.query(
+      "SELECT * FROM budget WHERE budget_id = ? AND user_id = ?",
+      [budgetId, userId]
+    );
+
+    if (!existing || existing.length === 0) {
+      throw new Error("Budget not found or does not belong to user");
+    }
+
+    // Delete the budget
+    const [result] = await db.query(
+      "DELETE FROM budget WHERE budget_id = ? AND user_id = ?",
+      [budgetId, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      throw new Error("Failed to delete budget");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in deleteBudget:", error);
     throw error;
   }
 };

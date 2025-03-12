@@ -2,6 +2,8 @@ import express from "express";
 import {
   createBudgetHandler,
   getBudgetHandler,
+  updateBudgetHandler,
+  deleteBudgetHandler,
 } from "../controllers/budgetController.js";
 import {
   createCategoryHandler,
@@ -10,12 +12,14 @@ import {
 
 const router = express.Router();
 
-// Category routes
+
 router.post("/categories", createCategoryHandler);
 router.get("/categories/:userId", getCategoriesHandler);
 
-// Budget routes
-router.post("/budget", createBudgetHandler);
-router.get("/budget/:userId", getBudgetHandler);
+
+router.post("/budgets", createBudgetHandler);
+router.get("/budgets/:userId", getBudgetHandler);
+router.put("/budgets", updateBudgetHandler);
+router.delete("/budgets/:budgetId", deleteBudgetHandler);
 
 export default router;

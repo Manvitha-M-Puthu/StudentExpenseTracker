@@ -1,4 +1,9 @@
-import { createBudget, findBudgetByUserId } from "../models/Budget.js";
+import {
+  createBudget,
+  findBudgetByUserId,
+  updateBudget,
+  deleteBudget,
+} from "../models/Budget.js";
 
 export const createBudgetHandler = async (req, res) => {
   console.log("Received budget creation request:", req.body);
@@ -56,11 +61,9 @@ export const createBudgetHandler = async (req, res) => {
   } catch (error) {
     console.error("Error in createBudgetHandler:", error);
     if (error.message === "Invalid category") {
-      return res
-        .status(400)
-        .json({
-          error: "Selected category is invalid or does not belong to the user",
-        });
+      return res.status(400).json({
+        error: "Selected category is invalid or does not belong to the user",
+      });
     }
     res.status(500).json({
       error: "Error creating budget. " + error.message,
@@ -86,6 +89,74 @@ export const getBudgetHandler = async (req, res) => {
     console.error("Error in getBudgetHandler:", error);
     res.status(500).json({
       error: "Error fetching budgets. " + error.message,
+      details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
+  }
+};
+
+export const updateBudgetHandler = async (req, res) => {
+  console.log("Received budget update request:", req.body);
+
+  const { budgetId, userId, amount, startDate, endDate } = req.body;
+
+  // Input validation
+  if (!budgetId || !userId) {
+    return res
+      .status(400)
+      .json({ error: "Budget ID and User ID are required" });
+  }
+  if (!amount || isNaN(amount)) {
+    return res.status(400).json({ error: "Valid amount is required" });
+  }
+  if (!startDate || !endDate) {
+    return res.status(400).json({ error: "Start and end dates are required" });
+  }
+
+  try {
+    const updatedBudgetId = await updateBudget({
+      budgetId,
+      userId,
+      amount: parseFloat(amount),
+      startDate,
+      endDate,
+    });
+
+    console.log("Budget updated successfully:", { budgetId: updatedBudgetId });
+    res.status(200).json({
+      message: "Budget updated successfully",
+      data: { budgetId: updatedBudgetId, amount, startDate, endDate },
+    });
+  } catch (error) {
+    console.error("Error in updateBudgetHandler:", error);
+    res.status(500).json({
+      error: "Error updating budget. " + error.message,
+      details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
+  }
+};
+
+export const deleteBudgetHandler = async (req, res) => {
+  console.log("Received budget delete request:", req.params);
+
+  const { budgetId } = req.params;
+  const { userId } = req.body;
+
+  if (!budgetId || !userId) {
+    return res
+      .status(400)
+      .json({ error: "Budget ID and User ID are required" });
+  }
+
+  try {
+    await deleteBudget({ budgetId, userId });
+    console.log("Budget deleted successfully:", { budgetId });
+    res.status(200).json({
+      message: "Budget deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error in deleteBudgetHandler:", error);
+    res.status(500).json({
+      error: "Error deleting budget. " + error.message,
       details: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
   }
