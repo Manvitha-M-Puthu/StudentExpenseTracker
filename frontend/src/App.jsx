@@ -11,6 +11,7 @@ import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import Profile from './pages/Profile/Profile';
 import DebtTracker from './pages/DebtTracker/DebtTracker';
+import './app.css';
 const PrivateRoute = ({ children }) => {
     const { currentUser } = useAuth();
 

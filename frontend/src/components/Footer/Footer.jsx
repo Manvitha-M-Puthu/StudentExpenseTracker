@@ -1,8 +1,10 @@
 // Footer.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './footer-css.css';
-
+import './footer.css';
+import piggyPal from '../Navbar/piggyPal.svg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFacebookF, faTwitter, faLinkedinIn, faYoutube, faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
 const Footer = () => {
   const [expandedColumn, setExpandedColumn] = useState(null);
   
@@ -19,8 +21,9 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-top">
           <div className="footer-logo">
-            <h3>COLORLIB</h3>
-            <p>© 2019</p>
+      
+            <img src={piggyPal} alt="" />
+            <h3>PiggyPal</h3>
           </div>
           
           <div className="footer-links">
@@ -71,34 +74,22 @@ const Footer = () => {
           <div className="footer-social">
             <h4>Follow us</h4>
             <div className="social-icons">
-              <a href="#" className="social-icon facebook" aria-label="Facebook">
-                <i className="fab fa-facebook-f"></i>
-              </a>
-              <a href="#" className="social-icon twitter" aria-label="Twitter">
-                <i className="fab fa-twitter"></i>
-              </a>
-              <a href="#" className="social-icon linkedin" aria-label="LinkedIn">
-                <i className="fab fa-linkedin-in"></i>
-              </a>
-              <a href="#" className="social-icon youtube" aria-label="YouTube">
-                <i className="fab fa-youtube"></i>
-              </a>
-              <a href="#" className="social-icon telegram" aria-label="Telegram">
-                <i className="fab fa-telegram-plane"></i>
-              </a>
-            </div>
+            <a href="#" className="social-icon facebook" aria-label="Facebook">
+              <FontAwesomeIcon icon={faFacebookF} />
+            </a>
+            <a href="#" className="social-icon twitter" aria-label="Twitter">
+              <FontAwesomeIcon icon={faTwitter} />
+            </a>
+            <a href="#" className="social-icon linkedin" aria-label="LinkedIn">
+              <FontAwesomeIcon icon={faLinkedinIn} />
+            </a>
+            <a href="#" className="social-icon youtube" aria-label="YouTube">
+              <FontAwesomeIcon icon={faYoutube} />
+            </a>
+            <a href="#" className="social-icon telegram" aria-label="Telegram">
+              <FontAwesomeIcon icon={faTelegramPlane} />
+            </a>
           </div>
-        </div>
-      </div>
-      
-      <div className="next-project">
-        <div className="next-project-container">
-          <div className="next-project-text">
-            <h3>Ready for a next project?</h3>
-            <p>Let's get started!</p>
-          </div>
-          <div className="next-project-cta">
-            <Link to="/contact" className="contact-btn">Contact us</Link>
           </div>
         </div>
       </div>
