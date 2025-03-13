@@ -1,0 +1,250 @@
+.debt-loans-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #333;
+}
+
+.debt-form-container {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.debt-form-container h2 {
+  margin-top: 0;
+  color: #1b5e20;
+  border-bottom: 2px solid #e8f5e9;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.submit-button {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.submit-button:hover {
+  background-color: #1b5e20;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.8rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c62828;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.8rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #2e7d32;
+}
+
+.debt-list-container {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.debt-list-container h2 {
+  margin-top: 0;
+  color: #1b5e20;
+  border-bottom: 2px solid #e8f5e9;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.debt-records {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.debt-records-header h3 {
+  color: #2e7d32;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.records-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.debt-card {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid #4caf50;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.debt-card.outgoing {
+  border-left-color: #2196f3;
+}
+
+.debt-card.paid {
+  opacity: 0.75;
+  border-left-color: #9e9e9e;
+}
+
+.debt-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.debt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.debt-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1b5e20;
+}
+
+.debt-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2e7d32;
+  margin-bottom: 0.8rem;
+}
+
+.outgoing .debt-amount {
+  color: #1976d2;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #fff8e1;
+  color: #f57f17;
+}
+
+.status-badge.paid {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.debt-details {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.debt-details p {
+  margin: 0.4rem 0;
+}
+
+.mark-paid-button {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.mark-paid-button:hover {
+  background-color: #1b5e20;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 2rem;
+  color: #757575;
+  font-size: 1.1rem;
+}
+
+.no-records {
+  text-align: center;
+  padding: 2rem;
+  color: #757575;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .debt-loans-container {
+    padding: 1rem;
+  }
+  
+  .debt-form-container,
+  .debt-list-container {
+    padding: 1.5rem;
+  }
+  
+  .records-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 992px) {
+  .debt-loans-container {
+    padding: 2rem;
+  }
+}
