@@ -241,9 +241,7 @@ const Transactions = () => {
   };
 
   const handleDeleteTransaction = async (transactionId) => {
-    if (!window.confirm('Are you sure you want to delete this transaction?')) {
-      return;
-    }
+  
     try {
       setLoading(true);
       await transactionApi.deleteTransaction(currentUser.user_id, transactionId);
