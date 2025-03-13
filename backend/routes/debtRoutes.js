@@ -1,9 +1,12 @@
 import express from 'express';
-import { createDebtHandler, getDebtsHandler } from '../controllers/debtController.js';
+import { getDebtsHandler, createDebtHandler, updateDebtStatusHandler } from '../controllers/debtController.js';
 
 const router = express.Router();
 
-router.post('/debt', createDebtHandler);
-router.get('/debt/:userId', getDebtsHandler);
+router.get('/:userId', getDebtsHandler);
+
+router.post('/', createDebtHandler);
+
+router.put('/:debtId', updateDebtStatusHandler);
 
 export default router;

@@ -10,7 +10,7 @@ import Budget from './pages/Budget/Budget';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import Profile from './pages/Profile/Profile';
-
+import DebtTracker from './pages/DebtTracker/DebtTracker';
 const PrivateRoute = ({ children }) => {
     const { currentUser } = useAuth();
 
@@ -36,6 +36,7 @@ const router = createBrowserRouter([
         {path:"/transaction",element:<PrivateRoute><Transaction /></PrivateRoute>},
         {path:"/savings",element:<PrivateRoute><Savings /></PrivateRoute>},
         {path:"/profile",element:<PrivateRoute><Profile /></PrivateRoute>},
+        {path:"/debttrack",element:<PrivateRoute><DebtTracker /></PrivateRoute>},
     ]},
 ]);
 

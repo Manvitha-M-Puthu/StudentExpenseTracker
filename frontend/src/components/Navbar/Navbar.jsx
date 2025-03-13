@@ -57,7 +57,10 @@ const Navbar = () => {
           <Link to="/savings" className={`nav-item ${isActive('/savings')}`} onClick={closeMobileMenu}>
             Savings
           </Link>
-          <Link to="/transactions" className={`nav-item ${isActive('/daily-spends')}`} onClick={closeMobileMenu}>
+          <Link to="/debttrack" className={`nav-item ${isActive('/debttrack')}`} onClick={closeMobileMenu}>
+            DebtTrack
+          </Link>
+          <Link to="/transaction" className={`nav-item ${isActive('/daily-spends')}`} onClick={closeMobileMenu}>
             Daily Spends
           </Link>
           

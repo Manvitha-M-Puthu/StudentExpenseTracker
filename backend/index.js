@@ -29,7 +29,7 @@ app.use("/api/wallet", walletRoutes);
 app.use("/api", budgetRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", transactionRoutes);
-app.use("/api", debtRoutes);
+app.use("/api/debts", debtRoutes);
 
 const PORT = 8800;
 app.listen(PORT, () => {
