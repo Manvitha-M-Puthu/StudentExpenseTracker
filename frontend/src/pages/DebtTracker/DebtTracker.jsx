@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '../../context/AuthContext';
 import API from '../../services/axiosInstance';
 import { motion } from 'framer-motion';
 import './DebtTracker.css';

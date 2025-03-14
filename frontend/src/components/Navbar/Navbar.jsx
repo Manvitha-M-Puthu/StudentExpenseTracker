@@ -2,7 +2,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './navbar.css';
-import { AuthContext } from '../../context/authContext';
+import { AuthContext } from '../../context/AuthContext';
 import piggyPal from './piggyPal.svg';
 const Navbar = () => {
   const location = useLocation();

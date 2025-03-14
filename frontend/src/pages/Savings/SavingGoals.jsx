@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../context/authContext';
+import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import Confetti from 'react-confetti';
 import { motion } from 'framer-motion';
@@ -14,18 +14,30 @@ const SavingGoals = () => {
     goal_name: '',
     target_amount: '',
     saved_amount: '',
+    monthly_contribution: '', // New field for monthly contribution
     deadline: '',
     priority: 'Medium'
   });
   const [editingGoal, setEditingGoal] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [walletInfo, setWalletInfo] = useState(null);
 
-  // Fetch all goals on component mount
+  // Fetch all goals and wallet info on component mount
   useEffect(() => {
     if (currentUser && currentUser.user_id) {
       fetchGoals();
+      fetchWalletInfo();
     }
   }, [currentUser]);
+
+  const fetchWalletInfo = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8800/api/wallet/${currentUser.user_id}`);
+      setWalletInfo(response.data);
+    } catch (error) {
+      console.error('Error fetching wallet info:', error);
+    }
+  };
 
   const fetchGoals = async () => {
     try {
@@ -82,6 +94,7 @@ const SavingGoals = () => {
       goal_name: goal.goal_name,
       target_amount: goal.target_amount,
       saved_amount: goal.saved_amount,
+      monthly_contribution: goal.monthly_contribution || '', // Include monthly contribution
       deadline: new Date(goal.deadline).toISOString().split('T')[0],
       priority: goal.priority
     });
@@ -97,8 +110,29 @@ const SavingGoals = () => {
     }
   };
 
-  const handleUpdateAmount = async (goal, newAmount) => {
+  const handleUpdateAmount = async (goal, amountChange) => {
     try {
+      const newAmount = parseFloat(goal.saved_amount) + amountChange;
+      
+      // Update wallet balance
+      if (walletInfo) {
+        const newWalletBalance = parseFloat(walletInfo.current_balance) - amountChange;
+        
+        // Prevent negative wallet balance
+        if (newWalletBalance < 0 && amountChange > 0) {
+          alert("Insufficient wallet balance!");
+          return;
+        }
+        
+        // Update wallet
+        await axios.put(`http://localhost:8800/api/wallet/${currentUser.user_id}`, {
+          current_balance: newWalletBalance
+        });
+        
+        // Refresh wallet info
+        fetchWalletInfo();
+      }
+      
       const updatedGoal = { 
         ...goal, 
         saved_amount: newAmount,
@@ -129,6 +163,7 @@ const SavingGoals = () => {
       goal_name: '',
       target_amount: '',
       saved_amount: '',
+      monthly_contribution: '', // Reset monthly contribution
       deadline: '',
       priority: 'Medium'
     });
@@ -183,6 +218,12 @@ const SavingGoals = () => {
           {isFormVisible ? 'Cancel' : '+ Add New Goal'}
         </button>
       </div>
+
+      {walletInfo && (
+        <div className="wallet-info">
+          <p>Current Wallet Balance: ₹{parseFloat(walletInfo.current_balance).toLocaleString()}</p>
+        </div>
+      )}
       
       <motion.div 
         className={`goal-form-container ${isFormVisible ? 'visible' : ''}`}
@@ -222,7 +263,7 @@ const SavingGoals = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="saved_amount">Saved Amount (₹)</label>
+              <label htmlFor="saved_amount">Initial Saved Amount (₹)</label>
               <input
                 type="number"
                 id="saved_amount"
@@ -238,6 +279,19 @@ const SavingGoals = () => {
           
           <div className="form-row">
             <div className="form-group">
+              <label htmlFor="monthly_contribution">Monthly Contribution (₹)</label>
+              <input
+                type="number"
+                id="monthly_contribution"
+                name="monthly_contribution"
+                value={formData.monthly_contribution}
+                onChange={handleInputChange}
+                placeholder="e.g., 1000"
+                min="0"
+              />
+            </div>
+            
+            <div className="form-group">
               <label htmlFor="deadline">Target Date</label>
               <input
                 type="date"
@@ -248,21 +302,21 @@ const SavingGoals = () => {
                 required
               />
             </div>
-            
-            <div className="form-group">
-              <label htmlFor="priority">Priority Level</label>
-              <select
-                id="priority"
-                name="priority"
-                value={formData.priority}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
-            </div>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="priority">Priority Level</label>
+            <select
+              id="priority"
+              name="priority"
+              value={formData.priority}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
           </div>
           
           <div className="form-actions">
@@ -320,25 +374,44 @@ const SavingGoals = () => {
                   Target date: {new Date(goal.deadline).toLocaleDateString()}
                 </p>
                 
+                {goal.monthly_contribution > 0 && (
+                  <p className="monthly-contribution">
+                    Monthly contribution: ₹{parseFloat(goal.monthly_contribution).toLocaleString()}
+                  </p>
+                )}
+                
                 <div className="quick-update">
-                  <button 
-                    onClick={() => handleUpdateAmount(
-                      goal, 
-                      parseFloat(goal.saved_amount) + 1000
-                    )}
-                    className="quick-add-btn"
-                  >
-                    +₹1000
-                  </button>
-                  <button 
-                    onClick={() => handleUpdateAmount(
-                      goal, 
-                      Math.max(0, parseFloat(goal.saved_amount) - 1000)
-                    )}
-                    className="quick-subtract-btn"
-                  >
-                    -₹1000
-                  </button>
+                  {goal.monthly_contribution > 0 ? (
+                    <>
+                      <button 
+                        onClick={() => handleUpdateAmount(goal, parseFloat(goal.monthly_contribution))}
+                        className="quick-add-btn"
+                      >
+                        +₹{parseFloat(goal.monthly_contribution).toLocaleString()}
+                      </button>
+                      <button 
+                        onClick={() => handleUpdateAmount(goal, -parseFloat(goal.monthly_contribution))}
+                        className="quick-subtract-btn"
+                      >
+                        -₹{parseFloat(goal.monthly_contribution).toLocaleString()}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => handleUpdateAmount(goal, 1000)}
+                        className="quick-add-btn"
+                      >
+                        +₹1000
+                      </button>
+                      <button 
+                        onClick={() => handleUpdateAmount(goal, -1000)}
+                        className="quick-subtract-btn"
+                      >
+                        -₹1000
+                      </button>
+                    </>
+                  )}
                 </div>
                 
                 <div className="goal-actions">

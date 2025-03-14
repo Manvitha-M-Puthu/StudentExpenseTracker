@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, createBrowserRouter,RouterProvider,Outlet } from 'react-router-dom';
-import { useAuth } from './context/authContext'; // Correct import
+import { useAuth } from './context/AuthContext'; // Correct import
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Wallet from './pages/Wallet/Wallet';
