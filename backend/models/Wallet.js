@@ -40,3 +40,18 @@ export const findWalletByUserId = async (userId) => {
     throw error;
   }
 };
+
+export const updateWallet = async (userId, currentBalance) => {
+  try {
+    await db.query(
+      'UPDATE wallet SET current_balance = ? WHERE user_id = ?',
+      [currentBalance, userId]
+    );
+    
+    // Return the updated wallet
+    return await findWalletByUserId(userId);
+  } catch (error) {
+    console.error("Error updating wallet:", error);
+    throw error;
+  }
+};

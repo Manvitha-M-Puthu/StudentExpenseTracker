@@ -1,4 +1,4 @@
-import { createWallet, findWalletByUserId } from '../models/Wallet.js'; 
+import { createWallet, findWalletByUserId, updateWallet} from '../models/Wallet.js'; 
 
 export const getWalletHandler = async (req, res) => {
 
@@ -29,5 +29,27 @@ export const createWalletHandler = async (req, res) => {
     } catch (error) {
         console.error("Error creating wallet:", error);
         res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+export const updateWalletHandler = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { current_balance } = req.body;
+
+        if (current_balance === undefined) {
+            return res.status(400).json({ message: "Current balance is required" });
+        }
+
+        const existingWallet = await findWalletByUserId(userId);
+        if (!existingWallet) {
+            return res.status(404).json({ message: "Wallet not found" });
+        }
+
+        const updatedWallet = await updateWallet(userId, current_balance);
+        return res.status(200).json(updatedWallet);
+    } catch (error) {
+        console.error("Error updating wallet:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };

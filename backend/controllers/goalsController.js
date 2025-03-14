@@ -4,7 +4,7 @@ import { SavingGoalModel } from '../models/goalsModel.js';
 // Create a new saving goal
 export const createSavingGoal = async (req, res) => {
   try {
-    const { goal_name, target_amount, saved_amount, deadline, priority, user_id } = req.body;
+    const { goal_name, target_amount, saved_amount, monthly_contribution, deadline, priority, user_id } = req.body;
     
     // Validation
     if (!goal_name || !target_amount || saved_amount === undefined || !deadline || !priority || !user_id) {
@@ -20,6 +20,7 @@ export const createSavingGoal = async (req, res) => {
       goal_name,
       target_amount,
       saved_amount,
+      monthly_contribution,
       deadline,
       priority
     };
@@ -96,7 +97,7 @@ export const getSavingGoalById = async (req, res) => {
 export const updateSavingGoal = async (req, res) => {
   try {
     const { id } = req.params;
-    const { goal_name, target_amount, saved_amount, deadline, priority, status, user_id } = req.body;
+    const { goal_name, target_amount, saved_amount, monthly_contribution, deadline, priority, status, user_id } = req.body;
     
     // Validation
     if (!goal_name || !target_amount || saved_amount === undefined || !deadline || !priority || !user_id) {
@@ -110,6 +111,7 @@ export const updateSavingGoal = async (req, res) => {
       goal_name,
       target_amount,
       saved_amount,
+      monthly_contribution,
       deadline,
       priority,
       status

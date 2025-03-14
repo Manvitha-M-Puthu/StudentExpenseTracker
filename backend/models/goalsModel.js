@@ -3,19 +3,22 @@ import db from "../utils/db.js";
 export const SavingGoalModel = {
   // Create a new saving goal
   create: async (goalData) => {
-    const { user_id, goal_name, priority, target_amount, saved_amount, deadline } = goalData;
-
+    const { user_id, goal_name, priority, target_amount, saved_amount, monthly_contribution, deadline } = goalData;
+    
     try {
       // Determine goal status
       const status = parseFloat(saved_amount) >= parseFloat(target_amount) ? "completed" : "active";
+      
+      // Convert deadline to MySQL format if it's an ISO string
+      const formattedDeadline = deadline ? new Date(deadline).toISOString().slice(0, 19).replace('T', ' ') : null;
 
       const query = `
         INSERT INTO saving_goals 
-        (user_id, goal_name, priority, target_amount, saved_amount, deadline, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+        (user_id, goal_name, priority, target_amount, saved_amount, monthly_contribution, deadline, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
       `;
 
-      const values = [user_id, goal_name, priority, target_amount, saved_amount, deadline, status];
+      const values = [user_id, goal_name, priority, target_amount, saved_amount, monthly_contribution || 0, formattedDeadline, status];
 
       const [result] = await db.execute(query, values);
 
@@ -70,7 +73,7 @@ export const SavingGoalModel = {
 
   // Update an existing saving goal
   update: async (goalId, goalData, userId) => {
-    const { goal_name, target_amount, saved_amount, deadline, priority, status } = goalData;
+    const { goal_name, target_amount, saved_amount, monthly_contribution, deadline, priority, status } = goalData;
 
     try {
       // First, check if the goal exists
@@ -81,6 +84,9 @@ export const SavingGoalModel = {
 
       // Determine goal status if not explicitly provided
       let goalStatus = status || (parseFloat(saved_amount) >= parseFloat(target_amount) ? "completed" : "active");
+      
+      // Convert deadline to MySQL format if it's an ISO string
+      const formattedDeadline = deadline ? new Date(deadline).toISOString().slice(0, 19).replace('T', ' ') : goal.deadline;
 
       const query = `
         UPDATE saving_goals
@@ -88,6 +94,7 @@ export const SavingGoalModel = {
           goal_name = ?,
           target_amount = ?,
           saved_amount = ?,
+          monthly_contribution = ?,
           deadline = ?,
           priority = ?,
           status = ?,
@@ -95,7 +102,18 @@ export const SavingGoalModel = {
         WHERE goal_id = ? AND user_id = ?
       `;
 
-      const values = [goal_name, target_amount, saved_amount, deadline, priority, goalStatus, goalId, userId];
+      const values = [
+        goal_name, 
+        target_amount, 
+        saved_amount, 
+        monthly_contribution || goal.monthly_contribution || 0, 
+        formattedDeadline, 
+        priority, 
+        goalStatus, 
+        goalId, 
+        userId
+      ];
+      
       await db.execute(query, values);
 
       // Fetch the updated row
@@ -135,7 +153,8 @@ export const SavingGoalModel = {
           COUNT(CASE WHEN status = 'active' THEN 1 END) AS active_goals_count,
           COUNT(CASE WHEN status = 'completed' THEN 1 END) AS completed_goals_count,
           SUM(CASE WHEN status = 'active' THEN target_amount ELSE 0 END) AS total_target_amount,
-          SUM(CASE WHEN status = 'active' THEN saved_amount ELSE 0 END) AS total_saved_amount
+          SUM(CASE WHEN status = 'active' THEN saved_amount ELSE 0 END) AS total_saved_amount,
+          SUM(CASE WHEN status = 'active' THEN monthly_contribution ELSE 0 END) AS total_monthly_contribution
         FROM saving_goals
         WHERE user_id = ?
       `;
