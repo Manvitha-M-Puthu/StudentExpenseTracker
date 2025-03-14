@@ -8,6 +8,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 import debtRoutes from "./routes/debtRoutes.js";
 import SavingGoalsRoute from "./routes/goalsRoute.js";
+import profileRoute from "./routes/profileRoutes.js";
 
 const app = express();
 app.use((req, res, next) => {
@@ -32,6 +33,7 @@ app.use("/api", categoryRoutes);
 app.use("/api", transactionRoutes);
 app.use("/api/debts", debtRoutes);
 app.use("/api",SavingGoalsRoute);
+app.use("/api/profile",profileRoute);
 
 const PORT = 8800;
 app.listen(PORT, () => {
