@@ -5,7 +5,7 @@ import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Wallet from './pages/Wallet/Wallet';
 import Transaction from './pages/Transaction/Transaction';
-import Savings from './pages/Savings/Savings';
+import SavingGoals from './pages/Savings/SavingGoals';
 import Budget from './pages/Budget/Budget';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
@@ -34,7 +34,7 @@ const router = createBrowserRouter([
         {path:"/",element:<PrivateRoute><Wallet /></PrivateRoute>},
         {path:"/budget",element:<PrivateRoute><Budget /></PrivateRoute>},
         {path:"/transaction",element:<PrivateRoute><Transaction /></PrivateRoute>},
-        {path:"/savings",element:<PrivateRoute><Savings /></PrivateRoute>},
+        {path:"/savings",element:<PrivateRoute><SavingGoals /></PrivateRoute>},
         {path:"/profile",element:<PrivateRoute><Profile /></PrivateRoute>},
         {path:"/debttrack",element:<PrivateRoute><DebtTracker /></PrivateRoute>},
     ]},
