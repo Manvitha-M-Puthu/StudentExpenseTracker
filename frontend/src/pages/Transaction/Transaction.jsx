@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getCategoryColor } from '../../utils/categoryColors';
 import * as transactionApi from '../../services/transactionApi';
@@ -50,63 +50,68 @@ const Transactions = () => {
     }
   }, [currentUser]);
 
-  const filteredTransactions = transactions.filter(transaction => {
-    let match = true;
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(transaction => {
+      let match = true;
 
-    if (filters.categoryId && transaction.category_id !== parseInt(filters.categoryId)) {
-      match = false;
-    }
-
-    if (filters.transactionType && transaction.transaction_type !== filters.transactionType) {
-      match = false;
-    }
-
-    if (filters.startDate && new Date(transaction.transaction_date) < new Date(filters.startDate)) {
-      match = false;
-    }
-
-    if (filters.endDate && new Date(transaction.transaction_date) > new Date(filters.endDate)) {
-      match = false;
-    }
-
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase();
-      const matchesDescription = transaction.description && 
-        transaction.description.toLowerCase().includes(query);
-      const matchesCategory = transaction.category_name && 
-        transaction.category_name.toLowerCase().includes(query);
-      
-      if (!matchesDescription && !matchesCategory) {
+      if (filters.categoryId && transaction.category_id !== parseInt(filters.categoryId)) {
         match = false;
       }
-    }
 
-    return match;
-  });
+      if (filters.transactionType && transaction.transaction_type !== filters.transactionType) {
+        match = false;
+      }
+
+      if (filters.startDate && new Date(transaction.transaction_date) < new Date(filters.startDate)) {
+        match = false;
+      }
+
+      if (filters.endDate && new Date(transaction.transaction_date) > new Date(filters.endDate)) {
+        match = false;
+      }
+
+      if (filters.searchQuery) {
+        const query = filters.searchQuery.toLowerCase();
+        const matchesDescription = transaction.description && 
+          transaction.description.toLowerCase().includes(query);
+        const matchesCategory = transaction.category_name && 
+          transaction.category_name.toLowerCase().includes(query);
+        
+        if (!matchesDescription && !matchesCategory) {
+          match = false;
+        }
+      }
+
+      return match;
+    });
+  }, [transactions, filters]);
 
   useEffect(() => {
-   
-    if (filteredTransactions.length > 0) {
-      const income = filteredTransactions
-        .filter(t => t.transaction_type === 'income')
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      
-      const expense = filteredTransactions
-        .filter(t => t.transaction_type === 'expense')
-        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-      
-      setStats({
-        totalIncome: income.toFixed(2),
-        totalExpense: expense.toFixed(2),
-        balance: (income - expense).toFixed(2)
-      });
-    } else {
-      setStats({
-        totalIncome: 0,
-        totalExpense: 0,
-        balance: 0
-      });
-    }
+    const calculateStats = () => {
+      if (filteredTransactions.length > 0) {
+        const income = filteredTransactions
+          .filter(t => t.transaction_type === 'income')
+          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        
+        const expense = filteredTransactions
+          .filter(t => t.transaction_type === 'expense')
+          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        
+        setStats({
+          totalIncome: income.toFixed(2),
+          totalExpense: expense.toFixed(2),
+          balance: (income - expense).toFixed(2)
+        });
+      } else {
+        setStats({
+          totalIncome: 0,
+          totalExpense: 0,
+          balance: 0
+        });
+      }
+    };
+
+    calculateStats();
   }, [filteredTransactions]);
 
   const fetchTransactions = async () => {
