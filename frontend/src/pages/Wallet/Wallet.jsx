@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from "../../context/AuthContext";
 import * as walletApi from '../../services/walletApi';
 import './wallet.css';
+import pigSave from '../../components/Navbar/piggyPal.svg';
 
 const Wallet = () => {
     const [wallet, setWallet] = useState(null);
@@ -20,7 +21,6 @@ const Wallet = () => {
         const fetchWallet = async () => {
             try {
                 const data = await walletApi.getUserWallet(currentUser.user_id);
-                console.log("Wallet response received:", data);
                 setWallet(data);
             } catch (error) {
                 if (error.response && error.response.status === 404) {
@@ -62,9 +62,8 @@ const Wallet = () => {
         
         // Calculate percentage of balance remaining
         const percentRemaining = initialBalance > 0 ? (balance / initialBalance) * 100 : 100;
-        console.log(`Wallet balance: ${balance}/${initialBalance} = ${percentRemaining}% remaining`);
         
-        // Determine color based on percentage remaining (smooth gradient from green to red)
+        // Determine color based on percentage remaining
         const getColor = (percent) => {
             // Ensure percentage is within bounds
             const boundedPercent = Math.max(0, Math.min(100, percent));
@@ -89,7 +88,6 @@ const Wallet = () => {
         };
         
         const color = getColor(percentRemaining);
-        console.log(`Color for ${percentRemaining}% balance: ${color}`);
         
         // Calculate the stroke-dasharray and stroke-dashoffset for circular progress
         const radius = 70;
@@ -124,7 +122,7 @@ const Wallet = () => {
                 </svg>
                 <div className="wallet-amount-display">
                     <div className="balance-value-wrapper">
-
+                       
                         <span className="amount-value">{wallet.current_balance}</span>
                     </div>
                     <div className="wallet-label">Current Balance</div>
@@ -133,70 +131,120 @@ const Wallet = () => {
         );
     };
 
+    // Money saving tips data
+    const savingTips = [
+        {
+            title: "50/30/20 Rule",
+            description: "Allocate 50% of income to needs, 30% to wants, and 20% to savings & debt repayment.",
+            icon: "📊"
+        },
+        {
+            title: "Automate Savings",
+            description: "Set up automatic transfers to your savings account on payday.",
+            icon: "🤖"
+        },
+        {
+            title: "Track Your Expenses",
+            description: "Use this app to categorize and monitor where your money goes.",
+            icon: "📱"
+        },
+        {
+            title: "Cook at Home",
+            description: "Prepare meals at home to save on food expenses.",
+            icon: "🍳"
+        },
+        {
+            title: "24-Hour Rule",
+            description: "Wait 24 hours before making non-essential purchases over ₹2,000.",
+            icon: "⏰"
+        },
+        {
+            title: "Use Cash Envelopes",
+            description: "Allocate cash for different spending categories to avoid overspending.",
+            icon: "💰"
+        }
+    ];
+
     if (loading) {
-        return <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading wallet data...</p>
-        </div>;
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading wallet data...</p>
+            </div>
+        );
     }
 
     if (error) {
-        return <div className="error-container">
-            <div className="error-icon">⚠️</div>
-            <h2>Something went wrong</h2>
-            <p>{error}</p>
-        </div>;
+        return (
+            <div className="error-container">
+                <div className="error-icon">⚠️</div>
+                <h2>Something went wrong</h2>
+                <p>{error}</p>
+            </div>
+        );
     }
 
     return (
         <div className="wallet-container">
-            <div className="wallet-header">
-                <h1><span className="wallet-icon">💼</span> My Wallet</h1>
-            </div>
+            <header className="wallet-header">
+                <div className="header-content">
+                    <img src={pigSave} alt="Piggy Bank" className="wallet-logo" />
+                    <h1>My Wallet</h1>
+                </div>
+            </header>
             
             {wallet ? (
-                <div className="wallet-content">
-                    <div className="wallet-details-card">
-                        <div className="wallet-circle-container">
-                            {renderWalletCircle()}
-                        </div>
-                        
-                        <div className="wallet-info">
-                            <div className="info-item">
-                                <span className="info-label">Initial Balance:</span>
-                                <span className="info-value">₹{wallet.initial_balance}</span>
+                <main className="wallet-content">
+                    <section className="wallet-details-card">
+                        <div className="wallet-balance-section">
+                            <div className="wallet-circle-container">
+                                {renderWalletCircle()}
                             </div>
                             
-                            <div className="info-item">
-                                <span className="info-label">Current Balance:</span>
-                                <span className="info-value balance-highlight">₹{wallet.current_balance}</span>
-                            </div>
-                            
-                            {wallet.initial_balance !== wallet.current_balance && (
+                            <div className="wallet-info">
                                 <div className="info-item">
-                                    <span className="info-label">Difference:</span>
-                                    <span className={`info-value ${parseFloat(wallet.current_balance) >= parseFloat(wallet.initial_balance) ? 'positive' : 'negative'}`}>
-                                        {parseFloat(wallet.current_balance) >= parseFloat(wallet.initial_balance) ? '+' : ''}
-                                        ₹{(parseFloat(wallet.current_balance) - parseFloat(wallet.initial_balance)).toFixed(2)}
-                                    </span>
+                                    <span className="info-label">Initial Balance:</span>
+                                    <span className="info-value">₹{wallet.initial_balance}</span>
                                 </div>
-                            )}
+                                
+                                <div className="info-item">
+                                    <span className="info-label">Current Balance:</span>
+                                    <span className="info-value balance-highlight">₹{wallet.current_balance}</span>
+                                </div>
+                                
+                                {wallet.initial_balance !== wallet.current_balance && (
+                                    <div className="info-item">
+                                        <span className="info-label">Difference:</span>
+                                        <span className={`info-value ${parseFloat(wallet.current_balance) >= parseFloat(wallet.initial_balance) ? 'positive' : 'negative'}`}>
+                                            {parseFloat(wallet.current_balance) >= parseFloat(wallet.initial_balance) ? '+' : ''}
+                                            ₹{(parseFloat(wallet.current_balance) - parseFloat(wallet.initial_balance)).toFixed(2)}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    </section>
                     
-                    <div className="wallet-tips">
-                        <h3><span className="tips-icon">💡</span> Wallet Tips</h3>
-                        <ul>
-                            <li>Track your expenses carefully to maintain a healthy balance</li>
-                            <li>Set budget goals to help manage your spending</li>
-                            <li>Review your transaction history regularly</li>
-                        </ul>
-                    </div>
-                </div>
+                    <section className="wallet-tips-section">
+                        <div className="tips-header">
+                            <img src={pigSave} alt="Savings Pig" className="tips-pig-icon" />
+                            <h2>Money Saving Tips</h2>
+                        </div>
+                        <div className="tips-grid">
+                            {savingTips.map((tip, index) => (
+                                <div className="tip-card" key={index}>
+                                    <div className="tip-icon">{tip.icon}</div>
+                                    <h3>{tip.title}</h3>
+                                    <p>{tip.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </main>
             ) : (
                 <div className="wallet-setup-card">
                     <div className="wallet-welcome">
-                        <div className="wallet-setup-icon">💰</div>
+                        <img src={pigSave} alt="Piggy Bank" className="setup-pig-icon" />
                         <h2>Welcome to Your Wallet</h2>
                         <p>Create your wallet to start tracking your finances and manage your budget effectively.</p>
                     </div>
@@ -221,7 +269,7 @@ const Wallet = () => {
                             </div>
                         </div>
                         <button type="submit" className="create-wallet-btn">
-                            <span className="btn-icon">✓</span> Create Wallet
+                            Create Wallet
                         </button>
                     </form>
                 </div>
