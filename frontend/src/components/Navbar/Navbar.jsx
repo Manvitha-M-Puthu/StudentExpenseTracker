@@ -1,15 +1,19 @@
 // Navbar.jsx
 import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import './navbar-css.css';
+import './navbar.css';
 import { AuthContext } from '../../context/authContext';
-
+import piggyPal from './piggyPal.svg';
 const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   // Function to check if a nav item is active
   const isActive = (path) => {
+    // Special case for transaction page which might have multiple paths
+    if (path === '/transaction' && (location.pathname === '/transaction' || location.pathname === '/daily-spends')) {
+      return 'active';
+    }
     return location.pathname === path ? 'active' : '';
   };
 
@@ -22,12 +26,12 @@ const Navbar = () => {
   };
 
   const {logout} = useContext(AuthContext);
-  const handleLogout = async() =>{
-    try{
+  const handleLogout = async() => {
+    try {
         await logout();
         navigate("/login");
-    }catch(err){
-        res.status(500).json("Something went wrong",err);
+    } catch(err) {
+        console.error("Something went wrong", err);
     }
   }
 
@@ -36,7 +40,7 @@ const Navbar = () => {
       <div className="navbar-container">
         <div className="navbar-logo">
           <Link to="/">
-            <div className="logo">Logo</div>
+            <div className="logo"><img src={piggyPal} alt="" /></div>
           </Link>
         </div>
         
@@ -51,17 +55,22 @@ const Navbar = () => {
         
         {/* Desktop and mobile navigation */}
         <div className={`navbar-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+        <Link to="/" className={`nav-item ${isActive('/')}`} onClick={closeMobileMenu}>
+            Wallet
+          </Link>
+          <Link to="/transaction" className={`nav-item ${isActive('/transaction')}`} onClick={closeMobileMenu}>
+            Transactions
+          </Link>
           <Link to="/budget" className={`nav-item ${isActive('/budget')}`} onClick={closeMobileMenu}>
             Budget
           </Link>
+         
+         
           <Link to="/savings" className={`nav-item ${isActive('/savings')}`} onClick={closeMobileMenu}>
             Savings
           </Link>
           <Link to="/debttrack" className={`nav-item ${isActive('/debttrack')}`} onClick={closeMobileMenu}>
             DebtTrack
-          </Link>
-          <Link to="/transaction" className={`nav-item ${isActive('/daily-spends')}`} onClick={closeMobileMenu}>
-            Daily Spends
           </Link>
           
           {/* Mobile-only logout and profile */}

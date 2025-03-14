@@ -1,0 +1,429 @@
+
+.wallet-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.wallet-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.wallet-header h1 {
+    color: #333;
+    font-size: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wallet-icon {
+    margin-right: 15px;
+    font-size: 2.2rem;
+}
+
+
+.wallet-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+.wallet-details-card {
+    background: linear-gradient(145deg, #ffffff, #f7f9fc);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    border-top: 5px solid #4CAF50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.wallet-details-card:hover {
+    transform: translateY(-5px);
+}
+
+.wallet-circle-container {
+    margin-bottom: 20px;
+}
+
+/* Circle indicator for balance */
+.wallet-circle-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.wallet-circle {
+    width: 160px;
+    height: 160px;
+}
+
+.wallet-circle-bg {
+    fill: none;
+    stroke: #e0e0e0;
+}
+
+.wallet-circle-indicator {
+    fill: none;
+    stroke-linecap: round;
+    transition: all 0.5s ease;
+    transform-origin: center;
+    transform: rotate(-90deg); /* Start from the top */
+}
+
+.wallet-amount-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.balance-value-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.currency-symbol {
+    font-size: 1rem;
+    color: #666;
+    margin-right: 3px;
+}
+
+.amount-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.wallet-label {
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+}
+
+/* Wallet information display */
+.wallet-info {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.info-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.info-value {
+    font-weight: 700;
+    color: #333;
+}
+
+.balance-highlight {
+    font-size: 1.1rem;
+    color: #4CAF50;
+}
+
+.positive {
+    color: #4CAF50;
+}
+
+.negative {
+    color: #F44336;
+}
+
+/* Wallet tips section */
+.wallet-tips {
+    background: linear-gradient(145deg, #ffffff, #f7f9fc);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    border-top: 5px solid #2196F3;
+    transition: transform 0.3s ease;
+}
+
+.wallet-tips:hover {
+    transform: translateY(-5px);
+}
+
+.wallet-tips h3 {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.tips-icon {
+    margin-right: 10px;
+    font-size: 1.4rem;
+}
+
+.wallet-tips ul {
+    padding-left: 20px;
+}
+
+.wallet-tips li {
+    margin-bottom: 12px;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Wallet setup (create wallet) */
+.wallet-setup-card {
+    background: linear-gradient(145deg, #ffffff, #f7f9fc);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 40px 30px;
+    border-top: 5px solid #FFC107;
+    transition: transform 0.3s ease;
+}
+
+.wallet-setup-card:hover {
+    transform: translateY(-5px);
+}
+
+.wallet-welcome {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.wallet-setup-icon {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-20px);}
+    60% {transform: translateY(-10px);}
+}
+
+.wallet-welcome h2 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.wallet-welcome p {
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Form styling */
+.wallet-form {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #444;
+    font-size: 1rem;
+}
+
+.form-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+.amount-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.currency-symbol {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 1.1rem;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.amount-input {
+    padding-left: 30px !important;
+    font-size: 1.2rem !important;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-control:focus {
+    border-color: #FFC107;
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25);
+    outline: none;
+}
+
+.create-wallet-btn {
+    background: linear-gradient(to right, #FFC107, #FF9800);
+    color: white;
+    font-size: 1.1rem;
+    padding: 12px 30px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.create-wallet-btn:hover {
+    background: linear-gradient(to right, #FF9800, #F57C00);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.create-wallet-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+/* Loading and error states */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-container {
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-top: 5px solid #F44336;
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.error-container h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.error-container p {
+    color: #666;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .wallet-details-card {
+        padding: 20px;
+    }
+    
+    .wallet-circle {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .amount-value {
+        font-size: 1.6rem;
+    }
+    
+    .wallet-tips {
+        padding: 20px;
+    }
+    
+    .wallet-setup-card {
+        padding: 30px 20px;
+    }
+    
+    .wallet-form {
+        padding: 15px;
+    }
+}
+
+@media (min-width: 992px) {
+    .wallet-content {
+        grid-template-columns: 1fr 1fr;
+    }
+}
