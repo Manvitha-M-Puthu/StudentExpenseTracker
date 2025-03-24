@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaUpload, FaEdit, FaSave, FaTimes, FaWallet, FaGraduationCap, FaCalendar, FaPhone, FaEnvelope } from 'react-icons/fa';
-import { AuthContext } from '../../context/AuthContext'; // Adjust the import path as needed
+import { AuthContext } from '../../context/AuthContext';
 import './ProfilePage.css';
 
 const Profile = () => {
@@ -92,7 +92,7 @@ const Profile = () => {
         }
       );
       
-      // Update profile with new image path
+    
       setProfile({
         ...profile,
         profile_picture: response.data.profile_picture
@@ -120,7 +120,6 @@ const Profile = () => {
       setEditMode(false);
       toast.success('Profile updated successfully');
       
-      // If we also have a file to upload, do that after updating the profile
       if (selectedFile) {
         await uploadProfilePicture();
       }
@@ -132,7 +131,6 @@ const Profile = () => {
 
   const toggleEditMode = () => {
     if (editMode) {
-      // Reset form data to current profile values
       setFormData({
         name: profile.name || '',
         email: profile.email || '',
@@ -230,11 +228,11 @@ const Profile = () => {
             <div className="wallet-balance">
               <div className="balance-item">
                 <span className="balance-label">Current Balance:</span>
-                {/* <span className="balance-value">${profile.current_balance?.toFixed(2) || '0.00'}</span> */}
+                <span className="balance-value">${Number(profile.current_balance|| 0).toFixed(2)}</span>
               </div>
               <div className="balance-item">
                 <span className="balance-label">Initial Balance:</span>
-                {/* <span className="balance-value">${profile.initial_balance?.toFixed(2) || '0.00'}</span> */}
+                <span className="balance-value">${Number(profile.initial_balance||0).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -317,6 +315,7 @@ const Profile = () => {
               </button>
             </form>
           ) : (
+            <>
             <div className="about-section">
               <h3>About Me</h3>
               <div className="about-content">
@@ -327,6 +326,40 @@ const Profile = () => {
                 )}
               </div>
             </div>
+            <div className="stats-section">
+              <h3>Financial Overview</h3>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <div className="stat-title">Savings Rate</div>
+                  <div className="stat-value">
+                    {profile.current_balance && profile.initial_balance 
+                      ? `${(((Number(profile.initial_balance) - Number(profile.current_balance)) / Number(profile.initial_balance)) * 100).toFixed(1)}%`
+                      : 'N/A'}
+                  </div>
+                  <div className="stat-label">of initial balance spent</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-title">Balance Status</div>
+                  <div className="stat-value" style={{ 
+                    color: Number(profile.current_balance) < Number(profile.initial_balance) * 0.3 
+                      ? '#d32f2f' 
+                      : Number(profile.current_balance) < Number(profile.initial_balance) * 0.7 
+                        ? '#ff9800' 
+                        : '#4caf50' 
+                  }}>
+                    {profile.current_balance && profile.initial_balance 
+                      ? Number(profile.current_balance) < Number(profile.initial_balance) * 0.3 
+                        ? 'Low' 
+                        : Number(profile.current_balance) < Number(profile.initial_balance) * 0.7 
+                          ? 'Moderate' 
+                          : 'Good' 
+                      : 'N/A'}
+                  </div>
+                  <div className="stat-label">based on spending trend</div>
+                </div>
+              </div>
+            </div>
+          </>
           )}
         </div>
       </div>

@@ -1,8 +1,8 @@
 /* ProfilePage.css */
 :root {
-  --primary-color: #4EB1BA; /* Light teal/blue */
-  --secondary-color: #A8DCD1; /* Lighter green-blue */
-  --accent-color: #287A78; /* Darker teal for contrast */
+  --primary-color: #4EB1BA; 
+  --secondary-color: #A8DCD1; 
+  --accent-color: #287A78;
   --light-gray: #f5f5f5;
   --medium-gray: #e0e0e0;
   --dark-gray: #888888;
@@ -56,9 +56,9 @@
   display: flex;
   flex-direction: row;
   gap: 2rem;
+  align-items: flex-start;
 }
 
-/* Sidebar Styles */
 .profile-sidebar {
   flex: 1;
   max-width: 340px;
@@ -66,6 +66,8 @@
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
+  position: sticky;
+  top: 1rem;
 }
 
 .profile-picture-container {
@@ -118,6 +120,7 @@
   margin-top: 0;
   margin-bottom: 1rem;
   color: var(--accent-color);
+  word-break: break-word; 
 }
 
 .info-item {
@@ -125,9 +128,11 @@
   align-items: center;
   margin-bottom: 0.8rem;
   color: var(--text-color);
+  word-break: break-word; 
 }
 
 .info-icon {
+  min-width: 20px; 
   margin-right: 0.8rem;
   color: var(--primary-color);
 }
@@ -165,6 +170,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap; 
 }
 
 .balance-item:last-child {
@@ -173,6 +179,7 @@
 
 .balance-label {
   color: var(--dark-gray);
+  margin-right: 0.5rem; 
 }
 
 .balance-value {
@@ -180,13 +187,14 @@
   color: var(--accent-color);
 }
 
-/* Main Content Styles */
+
 .profile-main {
   flex: 2;
   background-color: var(--white);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 2rem;
+  padding: 1.5rem;
+  width: 100%;
 }
 
 .about-section h3 {
@@ -207,7 +215,6 @@
   font-style: italic;
 }
 
-/* Form Styles */
 .profile-form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -232,6 +239,8 @@
   border-radius: var(--radius);
   font-size: 1rem;
   transition: border-color 0.2s ease;
+  width: 100%; 
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -245,7 +254,7 @@
   min-height: 100px;
 }
 
-/* Make the textarea span both columns */
+
 .form-group:nth-last-child(2) {
   grid-column: span 2;
 }
@@ -271,7 +280,7 @@
   background-color: var(--accent-color);
 }
 
-/* Loading and Error States */
+
 .loading, .error {
   display: flex;
   justify-content: center;
@@ -291,7 +300,77 @@
   color: #d32f2f;
 }
 
-/* Responsive Design */
+
+.stats-section {
+  margin-top: 2rem;
+}
+
+.stats-section h3 {
+  color: var(--accent-color);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--secondary-color);
+  padding-bottom: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.stat-card {
+  background-color: var(--light-gray);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-title {
+  font-size: 1rem;
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+}
+
+
+.about-section {
+  margin-bottom: 1rem;
+}
+
+.about-content {
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+
+@media (max-width: 1100px) {
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-group:nth-last-child(2),
+  .save-btn {
+    grid-column: 1;
+  }
+}
+
 @media (max-width: 968px) {
   .profile-content {
     flex-direction: column;
@@ -299,15 +378,36 @@
   
   .profile-sidebar {
     max-width: 100%;
+    position: static; 
+    width: 100%;
+    margin-bottom: 1.5rem;
   }
   
-  .profile-form {
+  .profile-picture-container {
+    height: 220px; 
+  }
+  
+  .profile-main {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
     grid-template-columns: 1fr;
   }
   
-  .form-group:nth-last-child(2),
-  .save-btn {
-    grid-column: span 1;
+  .profile-container {
+    margin: 1rem auto;
+    padding: 0 0.75rem;
+  }
+  .profile-picture-container {
+    height: auto; 
+  }
+  
+  .profile-picture {
+    height: auto; 
   }
 }
 
@@ -323,6 +423,49 @@
   }
   
   .profile-main {
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .wallet-balance {
+    padding: 0.75rem;
+  }
+  
+  .balance-item {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+  
+  .balance-value {
+    margin-top: 0.25rem;
+  }
+  
+  .info-item {
+    flex-wrap: wrap;
+  }
+  
+  /* Prevent text overflow on small screens */
+  h1, h2, h3, p, span {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+/* Ensure all inputs, especially date inputs, fit properly */
+@media (max-width: 420px) {
+  input[type="date"] {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .picture-upload-controls {
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .upload-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
 }

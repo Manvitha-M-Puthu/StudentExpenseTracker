@@ -1,16 +1,39 @@
 // Navbar.jsx
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './navbar.css';
 import { AuthContext } from '../../context/AuthContext';
+import axios from 'axios';
 import piggyPal from './piggyPal.svg';
+
 const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  // Function to check if a nav item is active
+  const { currentUser, logout } = useContext(AuthContext);
+  const [profilePicture, setProfilePicture] = useState(null);
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (currentUser) {
+        try {
+          const response = await axios.get(`http://localhost:8800/api/profile/${currentUser.user_id}`, {
+            withCredentials: true
+          });
+          if (response.data && response.data.profile_picture) {
+            setProfilePicture(response.data.profile_picture);
+          }
+        } catch (err) {
+          console.error('Error fetching profile picture:', err);
+        }
+      }
+    };
+
+    fetchProfilePicture();
+  }, [currentUser]);
+
+  
   const isActive = (path) => {
-    // Special case for transaction page which might have multiple paths
     if (path === '/transaction' && (location.pathname === '/transaction' || location.pathname === '/daily-spends')) {
       return 'active';
     }
@@ -25,7 +48,6 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
-  const {logout} = useContext(AuthContext);
   const handleLogout = async() => {
     try {
         await logout();
@@ -76,7 +98,7 @@ const Navbar = () => {
           {/* Mobile-only logout and profile */}
           <div className="mobile-nav-footer">
             <button className="logout-btn mobile-logout" onClick={() => {
-              handleLogout;
+              handleLogout();
               closeMobileMenu();
             }}>
               Logout
@@ -93,12 +115,19 @@ const Navbar = () => {
           </button>
           
           <Link to="/profile" className="profile-icon">
-            <div className="avatar"></div>
+            {profilePicture ? (
+              <img 
+                src={`http://localhost:8800/${profilePicture}`} 
+                alt="Profile" 
+                className="avatar" 
+              />
+            ) : (
+              <div className="avatar"></div>
+            )}
           </Link>
         </div>
       </div>
       
-      {/* Overlay for mobile menu */}
       {mobileMenuOpen && <div className="mobile-menu-overlay" onClick={closeMobileMenu}></div>}
     </nav>
   );

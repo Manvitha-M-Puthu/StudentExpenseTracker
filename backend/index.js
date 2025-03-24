@@ -9,8 +9,16 @@ import transactionRoutes from "./routes/transactionRoutes.js";
 import debtRoutes from "./routes/debtRoutes.js";
 import SavingGoalsRoute from "./routes/goalsRoute.js";
 import profileRoute from "./routes/profileRoutes.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
   next();
