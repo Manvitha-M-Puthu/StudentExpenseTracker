@@ -531,3 +531,32 @@ body{
     margin-bottom: 20px;
     gap:10px;
 }
+
+.expired-budgets {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.expired-budgets h2 {
+    color: #666;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(244, 67, 54, 0.3);
+}
+
+.budget-card.expired {
+    position: relative;
+}
+
+.expired-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #f44336;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}

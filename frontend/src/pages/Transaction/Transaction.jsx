@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/authContext';
 import { getCategoryColor } from '../../utils/categoryColors';
 import * as transactionApi from '../../services/transactionApi';
 import * as categoryApi from '../../services/categoryApi';
 import * as budgetApi from '../../services/budgetApi';
 import './transactions.css';
 import transcript from './transcript.svg'
+
 const Transactions = () => {
   const { currentUser } = useAuth();
   const [transactions, setTransactions] = useState([]);
@@ -43,85 +44,23 @@ const Transactions = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    if (currentUser && currentUser.user_id) {
+    if (currentUser) {
       fetchTransactions();
       fetchCategories();
       fetchBudgets();
     }
   }, [currentUser]);
 
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter(transaction => {
-      let match = true;
-
-      if (filters.categoryId && transaction.category_id !== parseInt(filters.categoryId)) {
-        match = false;
-      }
-
-      if (filters.transactionType && transaction.transaction_type !== filters.transactionType) {
-        match = false;
-      }
-
-      if (filters.startDate && new Date(transaction.transaction_date) < new Date(filters.startDate)) {
-        match = false;
-      }
-
-      if (filters.endDate && new Date(transaction.transaction_date) > new Date(filters.endDate)) {
-        match = false;
-      }
-
-      if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        const matchesDescription = transaction.description && 
-          transaction.description.toLowerCase().includes(query);
-        const matchesCategory = transaction.category_name && 
-          transaction.category_name.toLowerCase().includes(query);
-        
-        if (!matchesDescription && !matchesCategory) {
-          match = false;
-        }
-      }
-
-      return match;
-    });
-  }, [transactions, filters]);
-
-  useEffect(() => {
-    const calculateStats = () => {
-      if (filteredTransactions.length > 0) {
-        const income = filteredTransactions
-          .filter(t => t.transaction_type === 'income')
-          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        
-        const expense = filteredTransactions
-          .filter(t => t.transaction_type === 'expense')
-          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        
-        setStats({
-          totalIncome: income.toFixed(2),
-          totalExpense: expense.toFixed(2),
-          balance: (income - expense).toFixed(2)
-        });
-      } else {
-        setStats({
-          totalIncome: 0,
-          totalExpense: 0,
-          balance: 0
-        });
-      }
-    };
-
-    calculateStats();
-  }, [filteredTransactions]);
-
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const data = await transactionApi.getUserTransactions(currentUser.user_id);
-      setTransactions(data);
+      const response = await transactionApi.getUserTransactions();
+      setTransactions(response.data);
+      calculateStats(response.data);
     } catch (error) {
       console.error('Error fetching transactions:', error);
-      showMessage('Failed to fetch transactions', 'error');
+      setMessage(error.response?.data?.message || 'Failed to fetch transactions');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
@@ -129,50 +68,47 @@ const Transactions = () => {
 
   const fetchCategories = async () => {
     try {
-      const data = await categoryApi.getUserCategories(currentUser.user_id);
-      setCategories(data);
+      const response = await categoryApi.getUserCategories();
+      setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      showMessage('Failed to fetch categories', 'error');
+      setMessage(error.response?.data?.message || 'Failed to fetch categories');
+      setMessageType('error');
     }
   };
 
   const fetchBudgets = async () => {
     try {
-      const data = await budgetApi.getUserBudgets(currentUser.user_id);
-      setBudgets(data);
+      const response = await budgetApi.getUserBudgets();
+      setBudgets(response.data);
     } catch (error) {
       console.error('Error fetching budgets:', error);
-      showMessage('Failed to fetch budgets', 'error');
+      setMessage(error.response?.data?.message || 'Failed to fetch budgets');
+      setMessageType('error');
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Clear category and budget if switching to income
-    if (name === 'transactionType' && value === 'income') {
-      setNewTransaction({ 
-        ...newTransaction, 
-        [name]: value,
-        categoryId: '',
-        budgetId: ''
-      });
-    } else {
-      setNewTransaction({ ...newTransaction, [name]: value });
-    }
+  const calculateStats = (transactions) => {
+    const stats = transactions.reduce((acc, transaction) => {
+      if (transaction.transactionType === 'income') {
+        acc.totalIncome += parseFloat(transaction.amount);
+      } else {
+        acc.totalExpense += parseFloat(transaction.amount);
+      }
+      return acc;
+    }, { totalIncome: 0, totalExpense: 0 });
+
+    stats.balance = stats.totalIncome - stats.totalExpense;
+    setStats(stats);
   };
 
   const handleCreateTransaction = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const transactionData = {
-        ...newTransaction,
-        userId: currentUser.user_id
-      };
-
-      await transactionApi.createTransaction(transactionData);
+      const response = await transactionApi.createTransaction(newTransaction);
+      setTransactions([...transactions, response.data]);
+      calculateStats([...transactions, response.data]);
       setNewTransaction({
         amount: '',
         transactionType: 'expense',
@@ -181,39 +117,15 @@ const Transactions = () => {
         budgetId: '',
         transactionDate: new Date().toISOString().split('T')[0]
       });
-      fetchTransactions();
-      fetchBudgets(); 
-      showMessage('Transaction created successfully', 'success');
       setShowAddForm(false);
+      setMessage('Transaction created successfully');
+      setMessageType('success');
     } catch (error) {
       console.error('Error creating transaction:', error);
-      showMessage(error.response?.data?.error || 'Failed to create transaction', 'error');
+      setMessage(error.response?.data?.message || 'Failed to create transaction');
+      setMessageType('error');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEditClick = (transaction) => {
-    setEditingTransaction({
-      ...transaction,
-      transactionDate: transaction.formatted_date || transaction.transaction_date
-    });
-    setShowEditModal(true);
-  };
-
-  const handleEditInputChange = (e) => {
-    const { name, value } = e.target;
-    
-
-    if (name === 'transaction_type' && value === 'income') {
-      setEditingTransaction({ 
-        ...editingTransaction, 
-        [name]: value,
-        category_id: '',
-        budget_id: ''
-      });
-    } else {
-      setEditingTransaction({ ...editingTransaction, [name]: value });
     }
   };
 
@@ -221,69 +133,71 @@ const Transactions = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await transactionApi.updateTransaction(
-        currentUser.user_id,
+      const response = await transactionApi.updateTransaction(
         editingTransaction.transaction_id,
-        {
-          amount: editingTransaction.amount,
-          transactionType: editingTransaction.transaction_type,
-          description: editingTransaction.description,
-          categoryId: editingTransaction.category_id,
-          budgetId: editingTransaction.budget_id,
-          transactionDate: editingTransaction.transactionDate
-        }
+        editingTransaction
       );
+      const updatedTransactions = transactions.map(t =>
+        t.transaction_id === editingTransaction.transaction_id ? response.data : t
+      );
+      setTransactions(updatedTransactions);
+      calculateStats(updatedTransactions);
+      setEditingTransaction(null);
       setShowEditModal(false);
-      fetchTransactions();
-      fetchBudgets(); 
-      showMessage('Transaction updated successfully', 'success');
+      setMessage('Transaction updated successfully');
+      setMessageType('success');
     } catch (error) {
       console.error('Error updating transaction:', error);
-      showMessage(error.response?.data?.error || 'Failed to update transaction', 'error');
+      setMessage(error.response?.data?.message || 'Failed to update transaction');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteTransaction = async (transactionId) => {
-  
     try {
       setLoading(true);
-      await transactionApi.deleteTransaction(currentUser.user_id, transactionId);
-      fetchTransactions(); 
-      fetchBudgets(); 
-      showMessage('Transaction deleted successfully', 'success');
+      await transactionApi.deleteTransaction(transactionId);
+      const updatedTransactions = transactions.filter(t => t.transaction_id !== transactionId);
+      setTransactions(updatedTransactions);
+      calculateStats(updatedTransactions);
+      setMessage('Transaction deleted successfully');
+      setMessageType('success');
     } catch (error) {
       console.error('Error deleting transaction:', error);
-      showMessage(error.response?.data?.error || 'Failed to delete transaction', 'error');
+      setMessage(error.response?.data?.message || 'Failed to delete transaction');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters({ ...filters, [name]: value });
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      categoryId: '',
-      transactionType: '',
-      startDate: '',
-      endDate: '',
-      searchQuery: ''
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(transaction => {
+      let match = true;
+      if (filters.categoryId && transaction.categoryId !== filters.categoryId) {
+        match = false;
+      }
+      if (filters.transactionType && transaction.transactionType !== filters.transactionType) {
+        match = false;
+      }
+      if (filters.startDate && new Date(transaction.transactionDate) < new Date(filters.startDate)) {
+        match = false;
+      }
+      if (filters.endDate && new Date(transaction.transactionDate) > new Date(filters.endDate)) {
+        match = false;
+      }
+      if (filters.searchQuery && !transaction.description.toLowerCase().includes(filters.searchQuery.toLowerCase())) {
+        match = false;
+      }
+      return match;
     });
-  };
+  }, [transactions, filters]);
 
-  const showMessage = (text, type) => {
-    setMessage(text);
-    setMessageType(type);
-    setTimeout(() => {
-      setMessage('');
-      setMessageType('');
-    }, 5000);
-  };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="transactions-container">
@@ -302,11 +216,11 @@ const Transactions = () => {
       <div className="dashboard-summary">
         <div className="summary-card income">
           <h3>Total Income</h3>
-          <p>₹{stats.totalIncome}</p>
+          <p>₹{stats.totalIncome.toFixed(2)}</p>
         </div>
         <div className="summary-card expense">
           <h3>Total Expenses</h3>
-          <p>₹{stats.totalExpense}</p>
+          <p>₹{stats.totalExpense.toFixed(2)}</p>
         </div>
       </div>
       
@@ -338,7 +252,7 @@ const Transactions = () => {
                   type="number"
                   name="amount"
                   value={newTransaction.amount}
-                  onChange={handleInputChange}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
                   placeholder="Enter amount"
                   step="0.01"
                   min="0.01"
@@ -350,7 +264,7 @@ const Transactions = () => {
                 <select
                   name="transactionType"
                   value={newTransaction.transactionType}
-                  onChange={handleInputChange}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, transactionType: e.target.value })}
                   required
                 >
                   <option value="expense">Expense</option>
@@ -362,7 +276,7 @@ const Transactions = () => {
                 <select
                   name="categoryId"
                   value={newTransaction.categoryId}
-                  onChange={handleInputChange}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, categoryId: e.target.value })}
                   disabled={newTransaction.transactionType === 'income'}
                   className="category-select"
                 >
@@ -386,7 +300,7 @@ const Transactions = () => {
                 <select
                   name="budgetId"
                   value={newTransaction.budgetId}
-                  onChange={handleInputChange}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, budgetId: e.target.value })}
                   disabled={newTransaction.transactionType !== 'expense'}
                 >
                   <option value="">Select a budget</option>
@@ -410,7 +324,7 @@ const Transactions = () => {
                   type="text"
                   name="description"
                   value={newTransaction.description}
-                  onChange={handleInputChange}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, description: e.target.value })}
                   placeholder="Enter description"
                 />
               </div>
@@ -420,7 +334,7 @@ const Transactions = () => {
                   type="date"
                   name="transactionDate"
                   value={newTransaction.transactionDate}
-                  onChange={handleInputChange}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, transactionDate: e.target.value })}
                   required
                 />
               </div>
@@ -439,7 +353,13 @@ const Transactions = () => {
         <div className="transaction-section filters-section">
           <div className="section-header">
             <h2>Filters</h2>
-            <button onClick={clearFilters} className="btn-sm btn-text">Clear Filters</button>
+            <button onClick={() => setFilters({
+              categoryId: '',
+              transactionType: '',
+              startDate: '',
+              endDate: '',
+              searchQuery: ''
+            })} className="btn-sm btn-text">Clear Filters</button>
           </div>
           <div className="filters-grid">
             <div className="form-group">
@@ -448,7 +368,7 @@ const Transactions = () => {
                 type="text"
                 name="searchQuery"
                 value={filters.searchQuery}
-                onChange={handleFilterChange}
+                onChange={(e) => setFilters({ ...filters, searchQuery: e.target.value })}
                 placeholder="Search descriptions or categories"
               />
             </div>
@@ -457,7 +377,7 @@ const Transactions = () => {
               <select
                 name="categoryId"
                 value={filters.categoryId}
-                onChange={handleFilterChange}
+                onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
                 className="category-select"
               >
                 <option value="">All Categories</option>
@@ -480,7 +400,7 @@ const Transactions = () => {
               <select
                 name="transactionType"
                 value={filters.transactionType}
-                onChange={handleFilterChange}
+                onChange={(e) => setFilters({ ...filters, transactionType: e.target.value })}
               >
                 <option value="">All Types</option>
                 <option value="expense">Expense</option>
@@ -493,7 +413,7 @@ const Transactions = () => {
                 type="date"
                 name="startDate"
                 value={filters.startDate}
-                onChange={handleFilterChange}
+                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
               />
             </div>
             <div className="form-group">
@@ -502,7 +422,7 @@ const Transactions = () => {
                 type="date"
                 name="endDate"
                 value={filters.endDate}
-                onChange={handleFilterChange}
+                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
               />
             </div>
           </div>
@@ -557,7 +477,10 @@ const Transactions = () => {
                     )}
                   </div>
                   <div className="transaction-actions">
-                    <button onClick={() => handleEditClick(transaction)} className="btn-sm btn-edit">
+                    <button onClick={() => {
+                      setEditingTransaction(transaction);
+                      setShowEditModal(true);
+                    }} className="btn-sm btn-edit">
                       Edit
                     </button>
                     <button onClick={() => handleDeleteTransaction(transaction.transaction_id)} className="btn-sm btn-delete">
@@ -572,7 +495,13 @@ const Transactions = () => {
           <div className="no-data">
             <p>No transactions found</p>
             {Object.values(filters).some(value => value !== '') && (
-              <button onClick={clearFilters} className="btn-sm">Clear Filters</button>
+              <button onClick={() => setFilters({
+                categoryId: '',
+                transactionType: '',
+                startDate: '',
+                endDate: '',
+                searchQuery: ''
+              })} className="btn-sm">Clear Filters</button>
             )}
           </div>
         )}
@@ -594,7 +523,7 @@ const Transactions = () => {
                     type="number"
                     name="amount"
                     value={editingTransaction.amount}
-                    onChange={handleEditInputChange}
+                    onChange={(e) => setEditingTransaction({ ...editingTransaction, amount: e.target.value })}
                     step="0.01"
                     min="0.01"
                     required
@@ -605,7 +534,7 @@ const Transactions = () => {
                   <select
                     name="transaction_type"
                     value={editingTransaction.transaction_type}
-                    onChange={handleEditInputChange}
+                    onChange={(e) => setEditingTransaction({ ...editingTransaction, transaction_type: e.target.value })}
                     required
                   >
                     <option value="expense">Expense</option>
@@ -617,7 +546,7 @@ const Transactions = () => {
                   <select
                     name="category_id"
                     value={editingTransaction.category_id || ''}
-                    onChange={handleEditInputChange}
+                    onChange={(e) => setEditingTransaction({ ...editingTransaction, category_id: e.target.value })}
                     disabled={editingTransaction.transaction_type === 'income'}
                     className="category-select"
                   >
@@ -641,7 +570,7 @@ const Transactions = () => {
                   <select
                     name="budget_id"
                     value={editingTransaction.budget_id || ''}
-                    onChange={handleEditInputChange}
+                    onChange={(e) => setEditingTransaction({ ...editingTransaction, budget_id: e.target.value })}
                     disabled={editingTransaction.transaction_type !== 'expense'}
                   >
                     <option value="">Select a budget</option>
@@ -665,7 +594,7 @@ const Transactions = () => {
                     type="text"
                     name="description"
                     value={editingTransaction.description || ''}
-                    onChange={handleEditInputChange}
+                    onChange={(e) => setEditingTransaction({ ...editingTransaction, description: e.target.value })}
                     placeholder="Enter description"
                   />
                 </div>
@@ -675,7 +604,7 @@ const Transactions = () => {
                     type="date"
                     name="transactionDate"
                     value={editingTransaction.transactionDate}
-                    onChange={handleEditInputChange}
+                    onChange={(e) => setEditingTransaction({ ...editingTransaction, transactionDate: e.target.value })}
                     required
                   />
                 </div>

@@ -1,55 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from '../../context/authContext';
 import * as walletApi from '../../services/walletApi';
 import './wallet.css';
 import pigSave from '../../components/Navbar/piggyPal.svg';
 
 const Wallet = () => {
+    const { currentUser } = useAuth();
     const [wallet, setWallet] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [initialBalance, setInitialBalance] = useState(0);
-    
-    const { currentUser } = useAuth();
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
 
     useEffect(() => {
-        if (!currentUser) {
-            setLoading(false);
-            return;
+        if (currentUser) {
+            fetchWallet();
         }
-
-        const fetchWallet = async () => {
-            try {
-                const data = await walletApi.getUserWallet(currentUser.user_id);
-                setWallet(data);
-            } catch (error) {
-                if (error.response && error.response.status === 404) {
-                    setWallet(null); // No wallet found
-                } else {
-                    console.error("Error fetching wallet:", error);
-                    setError("Failed to load wallet data");
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchWallet();
     }, [currentUser]);
 
-    const handleCreateWallet = async (e) => {
-        e.preventDefault();
+    const fetchWallet = async () => {
         try {
             setLoading(true);
-            const data = await walletApi.createWallet(
-                currentUser.user_id, 
-                parseFloat(initialBalance) || 0
-            );
-            setWallet(data);
             setError(null);
+            const response = await walletApi.getUserWallet();
+            setWallet(response.data);
         } catch (error) {
-            console.error("Error creating wallet:", error);
-            setError("Failed to create wallet");
+            console.error('Error fetching wallet:', error);
+            setError(error.response?.data?.message || 'Failed to fetch wallet');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateWallet = async (initialBalance) => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await walletApi.createWallet(initialBalance);
+            setWallet(response.data);
+            setMessage('Wallet created successfully');
+            setMessageType('success');
+        } catch (error) {
+            console.error('Error creating wallet:', error);
+            setError(error.response?.data?.message || 'Failed to create wallet');
+            setMessageType('error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateBalance = async (newBalance) => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await walletApi.updateWalletBalance(newBalance);
+            setWallet(response.data);
+            setMessage('Wallet balance updated successfully');
+            setMessageType('success');
+        } catch (error) {
+            console.error('Error updating wallet balance:', error);
+            setError(error.response?.data?.message || 'Failed to update wallet balance');
+            setMessageType('error');
         } finally {
             setLoading(false);
         }
@@ -193,6 +204,12 @@ const Wallet = () => {
                 </div>
             </header>
             
+            {message && (
+                <div className={`message ${messageType}`}>
+                    {message}
+                </div>
+            )}
+            
             {wallet ? (
                 <main className="wallet-content">
                     <section className="wallet-details-card">
@@ -249,7 +266,11 @@ const Wallet = () => {
                         <p>Create your wallet to start tracking your finances and manage your budget effectively.</p>
                     </div>
                     
-                    <form onSubmit={handleCreateWallet} className="wallet-form">
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const initialBalance = e.target.initialBalance.value;
+                        handleCreateWallet(initialBalance);
+                    }} className="wallet-form">
                         <div className="form-group">
                             <label htmlFor="initialBalance">
                                 <span className="form-icon">💵</span> Initial Balance
@@ -259,12 +280,14 @@ const Wallet = () => {
                                 <input 
                                     type="number" 
                                     id="initialBalance" 
+                                    name="initialBalance"
                                     value={initialBalance} 
                                     onChange={(e) => setInitialBalance(e.target.value)}
                                     min="0"
                                     step="0.01"
                                     placeholder="0.00"
                                     className="form-control amount-input"
+                                    required
                                 />
                             </div>
                         </div>

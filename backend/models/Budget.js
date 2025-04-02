@@ -8,6 +8,14 @@ export const createBudget = async ({
   endDate,
 }) => {
   try {
+    console.log('createBudget model called with:', {
+      userId,
+      categoryId,
+      amount,
+      startDate,
+      endDate
+    });
+
     // Validate inputs
     if (!userId || !categoryId || !amount || !startDate || !endDate) {
       throw new Error("All fields are required");
@@ -23,6 +31,8 @@ export const createBudget = async ({
       "SELECT * FROM categories WHERE category_id = ? AND user_id = ?",
       [categoryId, userId]
     );
+
+    console.log('Category check result:', categoryRows);
 
     if (!categoryRows || categoryRows.length === 0) {
       throw new Error("Invalid category");
@@ -60,6 +70,8 @@ export const createBudget = async ({
       ]
     );
 
+    console.log('Overlapping budgets check:', existingBudgets);
+
     if (existingBudgets && existingBudgets.length > 0) {
       throw new Error(
         "A budget already exists for this category during the specified time period"
@@ -72,9 +84,19 @@ export const createBudget = async ({
       [userId, categoryId, amount, amount, startDate, endDate]
     );
 
+    console.log('Budget insert result:', result);
+
     if (!result || !result.insertId) {
       throw new Error("Failed to create budget");
     }
+
+    // Verify the inserted budget
+    const [verifyInsert] = await db.query(
+      "SELECT * FROM budget WHERE budget_id = ?",
+      [result.insertId]
+    );
+
+    console.log('Verified inserted budget:', verifyInsert[0]);
 
     return result.insertId;
   } catch (error) {

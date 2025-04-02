@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/authContext';
 import { getCategoryColor } from '../../utils/categoryColors';
 import * as categoryApi from '../../services/categoryApi';
 import * as budgetApi from '../../services/budgetApi';
@@ -20,13 +20,13 @@ const Budget = () => {
         startDate: '',
         endDate: '',
     });
-    const [message,setMessage] = useState(''); //uncomment message if alert needed
-    const [messageType,setMessageType] = useState('');//uncomment messageType if needed
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
     const [editingBudget, setEditingBudget] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
 
     useEffect(() => {
-        if (currentUser && currentUser.user_id) {
+        if (currentUser) {
             fetchCategories();
             fetchBudgets();
         }
@@ -34,22 +34,22 @@ const Budget = () => {
 
     const fetchCategories = async () => {
         try {
-            const data = await categoryApi.getUserCategories(currentUser.user_id);
-            setCategories(data);
+            const response = await categoryApi.getUserCategories();
+            setCategories(response.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
-            setMessage(error.response?.data?.error || 'Error fetching categories');
+            setMessage(error.response?.data?.message || 'Error fetching categories');
             setMessageType('error');
         }
     };
 
     const fetchBudgets = async () => {
         try {
-            const data = await budgetApi.getUserBudgets(currentUser.user_id);
-            setBudgets(data);
+            const response = await budgetApi.getUserBudgets();
+            setBudgets(response.data);
         } catch (error) {
             console.error('Error fetching budgets:', error);
-            setMessage(error.response?.data?.error || 'Error fetching budgets');
+            setMessage(error.response?.data?.message || 'Error fetching budgets');
             setMessageType('error');
         }
     };
@@ -63,7 +63,7 @@ const Budget = () => {
         }
 
         try {
-            await categoryApi.createCategory(currentUser.user_id, newCategory.trim());
+            await categoryApi.createCategory(newCategory.trim());
             setNewCategory('');
             fetchCategories();
             setMessage('Category created successfully');
@@ -74,7 +74,7 @@ const Budget = () => {
                 setMessage('This category already exists');
                 setMessageType('error');
             } else {
-                setMessage(error.response?.data?.error || 'Error creating category');
+                setMessage(error.response?.data?.message || 'Error creating category');
                 setMessageType('error');
             }
         }
@@ -84,34 +84,25 @@ const Budget = () => {
         e.preventDefault();
         try {
             const budgetData = {
-                userId: currentUser.user_id,
                 categoryId: newBudget.categoryId,
                 amount: newBudget.amount,
                 startDate: newBudget.startDate,
                 endDate: newBudget.endDate
             };
-
             await budgetApi.createBudget(budgetData);
-            
             setNewBudget({
                 categoryId: '',
                 amount: '',
                 startDate: '',
                 endDate: '',
             });
-            
             fetchBudgets();
             setMessage('Budget created successfully');
             setMessageType('success');
         } catch (error) {
             console.error('Error creating budget:', error);
-            if (error.response && error.response.status === 409) {
-                setMessage('A budget already exists for this category within this date range');
-                setMessageType('error');
-            } else {
-                setMessage(error.response?.data?.error || 'Error creating budget');
-                setMessageType('error');
-            }
+            setMessage(error.response?.data?.message || 'Error creating budget');
+            setMessageType('error');
         }
     };
 
@@ -123,45 +114,40 @@ const Budget = () => {
     const handleUpdateBudget = async (e) => {
         e.preventDefault();
         try {
-            const budgetData = {
-                categoryId: editingBudget.category_id,
-                amount: editingBudget.amount,
-                startDate: editingBudget.start_date,
-                endDate: editingBudget.end_date
-            };
-
-            await budgetApi.updateBudget(
-                currentUser.user_id, 
-                editingBudget.budget_id, 
-                budgetData
-            );
-            
+            await budgetApi.updateBudget(editingBudget.budget_id, editingBudget);
+            setEditingBudget(null);
             setShowEditModal(false);
             fetchBudgets();
             setMessage('Budget updated successfully');
             setMessageType('success');
         } catch (error) {
             console.error('Error updating budget:', error);
-            setMessage(error.response?.data?.error || 'Error updating budget');
+            setMessage(error.response?.data?.message || 'Error updating budget');
             setMessageType('error');
         }
     };
 
     const handleDeleteBudget = async (budgetId) => {
-        if (!window.confirm('Are you sure you want to delete this budget?')) {
-            return;
-        }
-        
         try {
-            await budgetApi.deleteBudget(currentUser.user_id, budgetId);
+            await budgetApi.deleteBudget(budgetId);
             fetchBudgets();
             setMessage('Budget deleted successfully');
             setMessageType('success');
         } catch (error) {
             console.error('Error deleting budget:', error);
-            setMessage(error.response?.data?.error || 'Error deleting budget');
+            setMessage(error.response?.data?.message || 'Error deleting budget');
             setMessageType('error');
         }
+    };
+
+    const getBudgetStatus = (budget) => {
+        const today = new Date();
+        const startDate = new Date(budget.start_date);
+        const endDate = new Date(budget.end_date);
+        
+        if (today < startDate) return 'future';
+        if (today > endDate) return 'expired';
+        return 'active';
     };
 
     const renderProgressCircle = (budget) => {
@@ -219,6 +205,58 @@ const Budget = () => {
         );
     };
 
+    const renderBudgetCard = (budget) => {
+        const categoryColor = getCategoryColor(budget.category_name);
+        const status = getBudgetStatus(budget);
+        const isExpired = status === 'expired';
+
+        return (
+            <div 
+                key={budget.budget_id} 
+                className={`budget-card ${isExpired ? 'expired' : ''}`}
+                style={{ 
+                    borderLeft: `4px solid ${categoryColor}`,
+                    backgroundColor: `${categoryColor}25`,
+                    opacity: isExpired ? 0.7 : 1
+                }}
+            >
+                <h3 style={{ 
+                    backgroundColor: `${categoryColor}85`,
+                    padding: '10px',
+                    borderRadius: '10px',
+                }}>
+                    {budget.category_name}
+                    {isExpired && <span className="expired-badge">Expired</span>}
+                </h3>
+                <div className="budget-progress-container">
+                    <div className="budget-details">
+                        <div className="content"> <img src={moneyLogo} alt="Money Logo" /> <p>Amount: ₹{budget.amount}</p></div>
+                        <div className="content"> <img src={pigSave} alt="Money Logo" /> <p>Remaining: ₹{budget.remaining_amount || budget.amount}</p></div>
+                        <div className="content"> <img src={startlogo} alt="Start Date Logo" /> <p>Start Date: {new Date(budget.start_date).toLocaleDateString()}</p></div>
+                        <div className="content"> <img src={endlogo} alt="End Date Logo" /> <p>End Date: {new Date(budget.end_date).toLocaleDateString()}</p></div>
+                    </div>
+                    <div className="circular-progress-container">
+                        {renderProgressCircle(budget)}
+                    </div>
+                </div>
+                <div className="budget-card-buttons">
+                    <button 
+                        className="edit-button"
+                        onClick={() => handleEditBudget(budget)}
+                    >
+                        Edit Budget
+                    </button>
+                    <button 
+                        className="delete-button"
+                        onClick={() => handleDeleteBudget(budget.budget_id)}
+                    >
+                        Delete Budget
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
     if (!currentUser) {
         return (
             <div className="budget-container">
@@ -241,60 +279,25 @@ const Budget = () => {
             
             <div className="budget-section">
                 {budgets.length > 0 && (
-                  <div className="active-budgets">
-                        <h2>Active Budgets</h2>
-                        <div className="categories-list">
-                        {budgets.map((budget) => {
-                            const categoryColor = getCategoryColor(budget.category_name);
-                            return (
-                                <div 
-                                    key={budget.budget_id} 
-                                    className="budget-card"
-                                    style={{ 
-                                        borderLeft: `4px solid ${categoryColor}`,
-                                        backgroundColor: `${categoryColor}25`,
-                                  
-                            
-                                    }}
-                                >
-                                    <h3  style={{ 
-                                     
-                                        backgroundColor: `${categoryColor}85`,
-                                        padding: '10px',
-                                        borderRadius: '10px',
-                                  
-                            
-                                    }}>{budget.category_name}</h3>
-                                    <div className="budget-progress-container">
-                                        <div className="budget-details">
-                                            <div className="content"> <img src={moneyLogo} alt="Money Logo" /> <p>Amount:  ₹{budget.amount}</p></div>
-                                            <div className="content"> <img src={pigSave} alt="Money Logo" /> <p>Remaining:  ₹{budget.remaining_amount || budget.amount}</p></div>
-                                            <div className="content"> <img src={startlogo} alt="Start Date Logo" /> <p>Start Date: {new Date(budget.start_date).toLocaleDateString()}</p></div>
-                                            <div className="content"> <img src={endlogo} alt="End Date Logo" /> <p>End Date: {new Date(budget.end_date).toLocaleDateString()}</p></div>
-                                        </div>
-                                        <div className="circular-progress-container">
-                                            {renderProgressCircle(budget)}
-                                        </div>
-                                    </div>
-                                    <div className="budget-card-buttons">
-                                        <button 
-                                            className="edit-button"
-                                            onClick={() => handleEditBudget(budget)}
-                                        >
-                                            Edit Budget
-                                        </button>
-                                        <button 
-                                            className="delete-button"
-                                            onClick={() => handleDeleteBudget(budget.budget_id)}
-                                        >
-                                            Delete Budget
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    </div>
+                    <>
+                        <div className="active-budgets">
+                            <h2>Active Budgets</h2>
+                            <div className="categories-list">
+                                {budgets
+                                    .filter(budget => getBudgetStatus(budget) === 'active')
+                                    .map(renderBudgetCard)}
+                            </div>
+                        </div>
+
+                        <div className="expired-budgets">
+                            <h2>Expired Budgets</h2>
+                            <div className="categories-list">
+                                {budgets
+                                    .filter(budget => getBudgetStatus(budget) === 'expired')
+                                    .map(renderBudgetCard)}
+                            </div>
+                        </div>
+                    </>
                 )}
             </div>
                     {/* create categories section */}

@@ -1,0 +1,209 @@
+.dashboard {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.dashboard .MuiCard-root {
+  height: 100%;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background-color: #ffffff;
+  border-radius: 12px;
+}
+
+.dashboard .MuiCard-root:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard .MuiTypography-h4 {
+  margin-bottom: 30px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.dashboard .MuiTypography-h6 {
+  color: #34495e;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.dashboard .MuiCardContent-root {
+  padding: 24px;
+}
+
+.dashboard .CircularProgressbar {
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard .CircularProgressbar .CircularProgressbar-text {
+  fill: #2c3e50;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.dashboard .CircularProgressbar .CircularProgressbar-path {
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.dashboard .CircularProgressbar .CircularProgressbar-trail {
+  stroke: #ecf0f1;
+}
+
+.dashboard .MuiCard-root.MuiCard-outlined {
+  background-color: #f8f9fa;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  margin-bottom: 8px;
+}
+
+.dashboard .wallet-balance {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #3498db;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .dashboard {
+    padding: 10px;
+  }
+
+  .dashboard .MuiCard-root {
+    margin-bottom: 16px;
+  }
+
+  .dashboard .MuiTypography-h4 {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+  }
+
+  .dashboard .MuiTypography-h6 {
+    font-size: 1.1rem;
+  }
+
+  .progress-card {
+    margin-bottom: 20px;
+  }
+  
+  .budget-detail, .savings-detail {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard .MuiCard-root {
+    margin-bottom: 12px;
+  }
+
+  .dashboard .MuiCardContent-root {
+    padding: 16px;
+  }
+
+  .dashboard .MuiTypography-h4 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .dashboard .wallet-balance {
+    font-size: 1.5rem;
+  }
+}
+
+/* Chart Responsiveness */
+.dashboard .recharts-wrapper {
+  margin: 0 auto;
+}
+
+.dashboard .recharts-surface {
+  overflow: visible;
+}
+
+/* Loading State */
+.dashboard-loading {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card Content Spacing */
+.dashboard .card-content-spacing {
+  margin-top: 16px;
+}
+
+/* Progress Indicators */
+.dashboard .progress-label {
+  margin-top: 8px;
+  text-align: center;
+  color: #7f8c8d;
+}
+
+/* Tooltip Styling */
+.dashboard .recharts-tooltip-wrapper {
+  background-color: rgba(255, 255, 255, 0.96);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+}
+
+.progress-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.progress-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.budget-detail, .savings-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.budget-detail:last-child, .savings-detail:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: #666;
+  min-width: 100px;
+  text-align: left;
+}
+
+.wallet-balance {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+/* Progress bar colors */
+.budget-progress {
+  --progress-color: #4caf50;
+}
+
+.budget-progress.warning {
+  --progress-color: #ff9800;
+}
+
+.budget-progress.danger {
+  --progress-color: #f44336;
+}
+
+.savings-progress {
+  --progress-color: #2196f3;
+}
+
+.savings-progress.warning {
+  --progress-color: #ff9800;
+}
+
+.savings-progress.success {
+  --progress-color: #4caf50;
+} 

@@ -6,16 +6,21 @@ import {
 import {
   createBudgetHandler,
   getBudgetHandler,
+  updateBudgetHandler,
+  deleteBudgetHandler,
 } from "../controllers/budgetController.js";
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Category routes
-router.post("/categories", createCategoryHandler);
-router.get("/categories/:userId", getCategoriesHandler);
+router.post("/budget/categories", authenticateToken, createCategoryHandler);
+router.get("/budget/categories", authenticateToken, getCategoriesHandler);
 
 // Budget routes
-router.post("/budgets", createBudgetHandler);
-router.get("/budgets/:userId", getBudgetHandler);
+router.post("/budget", authenticateToken, createBudgetHandler);
+router.get("/budget", authenticateToken, getBudgetHandler);
+router.put("/budget/:budgetId", authenticateToken, updateBudgetHandler);
+router.delete("/budget/:budgetId", authenticateToken, deleteBudgetHandler);
 
 export default router;

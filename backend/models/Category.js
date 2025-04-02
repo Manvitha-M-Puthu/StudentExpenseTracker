@@ -76,3 +76,37 @@ export const getCategoriesByUserId = async (userId) => {
     throw error;
   }
 };
+
+export const deleteCategory = async (categoryId, userId) => {
+  try {
+    // Input validation
+    if (!categoryId || isNaN(categoryId)) {
+      throw new Error("Valid category ID is required");
+    }
+
+    if (!userId || isNaN(userId)) {
+      throw new Error("Valid user ID is required");
+    }
+
+    // Check if category exists and belongs to the user
+    const [category] = await db.query(
+      "SELECT * FROM categories WHERE category_id = ? AND user_id = ?",
+      [categoryId, userId]
+    );
+
+    if (!category || category.length === 0) {
+      return false;
+    }
+
+    // Delete the category
+    const [result] = await db.query(
+      "DELETE FROM categories WHERE category_id = ? AND user_id = ?",
+      [categoryId, userId]
+    );
+
+    return result.affectedRows > 0;
+  } catch (error) {
+    console.error("Error in deleteCategory:", error);
+    throw error;
+  }
+};

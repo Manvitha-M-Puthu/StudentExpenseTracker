@@ -6,9 +6,9 @@ import API from './axiosInstance';
  */
 
 // Get all categories for a user
-export const getUserCategories = async (userId) => {
+export const getUserCategories = async () => {
   try {
-    const response = await API.get(`/api/categories/${userId}`);
+    const response = await API.get('/api/categories');
     return response.data;
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -17,10 +17,9 @@ export const getUserCategories = async (userId) => {
 };
 
 // Create a new category
-export const createCategory = async (userId, categoryName) => {
+export const createCategory = async (categoryName) => {
   try {
     const response = await API.post('/api/categories', {
-      userId,
       categoryName
     });
     return response.data;
@@ -31,9 +30,9 @@ export const createCategory = async (userId, categoryName) => {
 };
 
 // Delete a category
-export const deleteCategory = async (userId, categoryId) => {
+export const deleteCategory = async (categoryId) => {
   try {
-    const response = await API.delete(`/api/categories/${userId}/${categoryId}`);
+    const response = await API.delete(`/api/categories/${categoryId}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting category:', error);

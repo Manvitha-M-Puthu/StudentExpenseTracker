@@ -6,9 +6,9 @@ import API from './axiosInstance';
  */
 
 // Get user wallet
-export const getUserWallet = async (userId) => {
+export const getUserWallet = async () => {
   try {
-    const response = await API.get(`/api/wallet/${userId}`);
+    const response = await API.get('/api/wallet/balance');
     return response.data;
   } catch (error) {
     console.error('Error fetching wallet:', error);
@@ -17,10 +17,9 @@ export const getUserWallet = async (userId) => {
 };
 
 // Create a new wallet
-export const createWallet = async (userId, initialBalance) => {
+export const createWallet = async (initialBalance) => {
   try {
     const response = await API.post('/api/wallet', {
-      userId,
       initial_balance: parseFloat(initialBalance) || 0
     });
     return response.data;
@@ -31,9 +30,9 @@ export const createWallet = async (userId, initialBalance) => {
 };
 
 // Update wallet balance
-export const updateWalletBalance = async (userId, newBalance) => {
+export const updateWalletBalance = async (newBalance) => {
   try {
-    const response = await API.put(`/api/wallet/${userId}`, {
+    const response = await API.put('/api/wallet', {
       current_balance: parseFloat(newBalance)
     });
     return response.data;

@@ -6,9 +6,9 @@ import API from './axiosInstance';
  */
 
 // Get all transactions for a user
-export const getUserTransactions = async (userId) => {
+export const getUserTransactions = async () => {
   try {
-    const response = await API.get(`/api/transactions/${userId}`);
+    const response = await API.get('/api/transactions');
     return response.data;
   } catch (error) {
     console.error('Error fetching transactions:', error);
@@ -28,10 +28,10 @@ export const createTransaction = async (transactionData) => {
 };
 
 // Update an existing transaction
-export const updateTransaction = async (userId, transactionId, transactionData) => {
+export const updateTransaction = async (transactionId, transactionData) => {
   try {
     const response = await API.put(
-      `/api/transactions/${userId}/${transactionId}`,
+      `/api/transactions/${transactionId}`,
       transactionData
     );
     return response.data;
@@ -42,12 +42,34 @@ export const updateTransaction = async (userId, transactionId, transactionData) 
 };
 
 // Delete a transaction
-export const deleteTransaction = async (userId, transactionId) => {
+export const deleteTransaction = async (transactionId) => {
   try {
-    const response = await API.delete(`/api/transactions/${userId}/${transactionId}`);
+    const response = await API.delete(`/api/transactions/${transactionId}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting transaction:', error);
+    throw error;
+  }
+};
+
+// Get budget summary
+export const getBudgetSummary = async () => {
+  try {
+    const response = await API.get('/api/transactions/budget/summary');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching budget summary:', error);
+    throw error;
+  }
+};
+
+// Get monthly transactions summary
+export const getMonthlyTransactions = async () => {
+  try {
+    const response = await API.get('/api/transactions/monthly');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching monthly transactions:', error);
     throw error;
   }
 };
@@ -57,5 +79,7 @@ export default {
   getUserTransactions,
   createTransaction,
   updateTransaction,
-  deleteTransaction
+  deleteTransaction,
+  getBudgetSummary,
+  getMonthlyTransactions
 };

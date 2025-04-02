@@ -40,14 +40,7 @@ export const createSavingGoal = async (req, res) => {
 // Get all saving goals for a user
 export const getAllSavingGoals = async (req, res) => {
   try {
-    const user_id = req.query.userId;
-    
-    if (!user_id) {
-      return res.status(400).json({
-        success: false,
-        message: 'User ID is required'
-      });
-    }
+    const user_id = req.user.id;
     
     const goals = await SavingGoalModel.getAllByUserId(user_id);
     
@@ -97,27 +90,56 @@ export const getSavingGoalById = async (req, res) => {
 export const updateSavingGoal = async (req, res) => {
   try {
     const { id } = req.params;
-    const { goal_name, target_amount, saved_amount, monthly_contribution, deadline, priority, status, user_id } = req.body;
+    const userId = req.user.id; // Get user ID from the authenticated request
     
-    // Validation
-    if (!goal_name || !target_amount || saved_amount === undefined || !deadline || !priority || !user_id) {
+    if (!id || !userId) {
       return res.status(400).json({ 
         success: false,
-        message: 'Please provide all required fields'
+        message: 'Goal ID and User ID are required'
       });
     }
+
+    // Get the existing goal to use as defaults
+    const existingGoal = await SavingGoalModel.getById(id, userId);
+    if (!existingGoal) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Saving goal not found'
+      });
+    }
+
+    // For partial updates, only include the fields that are being updated
+    const goalData = {};
     
-    const goalData = {
-      goal_name,
-      target_amount,
-      saved_amount,
-      monthly_contribution,
-      deadline,
-      priority,
-      status
-    };
+    // Only include fields that are present in the request
+    if (req.body.saved_amount !== undefined) {
+      goalData.saved_amount = parseFloat(req.body.saved_amount);
+    }
+    if (req.body.status !== undefined) {
+      goalData.status = req.body.status;
+    }
+    if (req.body.goal_name !== undefined) {
+      goalData.goal_name = req.body.goal_name;
+    }
+    if (req.body.target_amount !== undefined) {
+      goalData.target_amount = parseFloat(req.body.target_amount);
+    }
+    if (req.body.monthly_contribution !== undefined) {
+      goalData.monthly_contribution = parseFloat(req.body.monthly_contribution);
+    }
+    if (req.body.deadline !== undefined) {
+      goalData.deadline = req.body.deadline;
+    }
+    if (req.body.priority !== undefined) {
+      goalData.priority = req.body.priority;
+    }
     
-    const updatedGoal = await SavingGoalModel.update(id, goalData, user_id);
+    // If no fields to update, return the existing goal
+    if (Object.keys(goalData).length === 0) {
+      return res.status(200).json(existingGoal);
+    }
+    
+    const updatedGoal = await SavingGoalModel.update(id, goalData, userId);
     
     if (!updatedGoal) {
       return res.status(404).json({ 

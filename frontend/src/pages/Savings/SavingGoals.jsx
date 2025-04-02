@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import axios from 'axios';
+import { AuthContext } from '../../context/authContext';
+import axiosInstance from '../../services/axiosInstance';
 import Confetti from 'react-confetti';
 import { motion } from 'framer-motion';
 import './SavingGoals.css';
@@ -14,7 +14,7 @@ const SavingGoals = () => {
     goal_name: '',
     target_amount: '',
     saved_amount: '',
-    monthly_contribution: '', // New field for monthly contribution
+    monthly_contribution: '',
     deadline: '',
     priority: 'Medium'
   });
@@ -32,17 +32,19 @@ const SavingGoals = () => {
 
   const fetchWalletInfo = async () => {
     try {
-      const response = await axios.get(`http://localhost:8800/api/wallet/${currentUser.user_id}`);
-      setWalletInfo(response.data);
+      const response = await axiosInstance.get('/api/wallet/balance');
+      setWalletInfo({
+        balance: response.data.data?.balance || 0
+      });
     } catch (error) {
       console.error('Error fetching wallet info:', error);
+      setWalletInfo({ balance: 0 });
     }
   };
 
   const fetchGoals = async () => {
     try {
-      // Get goals directly from the API endpoint without authentication middleware
-      const response = await axios.get(`http://localhost:8800/api/saving-goals?userId=${currentUser.user_id}`);
+      const response = await axiosInstance.get('/api/savings');
       
       // Separate active and completed goals
       const activeGoals = response.data.filter(goal => goal.status !== 'completed');
@@ -66,21 +68,18 @@ const SavingGoals = () => {
     try {
       const dataToSubmit = {
         ...formData,
-        user_id: currentUser.user_id // Add user ID manually
+        user_id: currentUser.user_id
       };
       
       if (editingGoal) {
-        // Update existing goal
-        await axios.put(
-          `http://localhost:8800/api/saving-goals/${editingGoal.goal_id}`,
+        await axiosInstance.put(
+          `/api/savings/${editingGoal.goal_id}`,
           dataToSubmit
         );
       } else {
-        // Create new goal
-        await axios.post('http://localhost:8800/api/saving-goals', dataToSubmit);
+        await axiosInstance.post('/api/savings', dataToSubmit);
       }
       
-      // Reset form and fetch updated goals
       resetForm();
       fetchGoals();
     } catch (error) {
@@ -94,7 +93,7 @@ const SavingGoals = () => {
       goal_name: goal.goal_name,
       target_amount: goal.target_amount,
       saved_amount: goal.saved_amount,
-      monthly_contribution: goal.monthly_contribution || '', // Include monthly contribution
+      monthly_contribution: goal.monthly_contribution || '',
       deadline: new Date(goal.deadline).toISOString().split('T')[0],
       priority: goal.priority
     });
@@ -103,7 +102,7 @@ const SavingGoals = () => {
 
   const handleDelete = async (goalId) => {
     try {
-      await axios.delete(`http://localhost:8800/api/saving-goals/${goalId}?userId=${currentUser.user_id}`);
+      await axiosInstance.delete(`/api/savings/${goalId}`);
       fetchGoals();
     } catch (error) {
       console.error('Error deleting goal:', error);
@@ -114,47 +113,54 @@ const SavingGoals = () => {
     try {
       const newAmount = parseFloat(goal.saved_amount) + amountChange;
       
-      // Update wallet balance
       if (walletInfo) {
-        const newWalletBalance = parseFloat(walletInfo.current_balance) - amountChange;
+        const currentBalance = parseFloat(walletInfo.balance || 0);
+        const newWalletBalance = currentBalance - amountChange;
         
-        // Prevent negative wallet balance
         if (newWalletBalance < 0 && amountChange > 0) {
           alert("Insufficient wallet balance!");
           return;
         }
         
-        // Update wallet
-        await axios.put(`http://localhost:8800/api/wallet/${currentUser.user_id}`, {
+        // First, ensure wallet exists
+        try {
+          await axiosInstance.get('/api/wallet/balance');
+        } catch (error) {
+          // If wallet doesn't exist, create it
+          await axiosInstance.post('/api/wallet', {
+            initial_balance: currentBalance
+          });
+        }
+        
+        // Now update the wallet balance
+        await axiosInstance.put('/api/wallet', {
           current_balance: newWalletBalance
         });
         
-        // Refresh wallet info
         fetchWalletInfo();
       }
       
-      const updatedGoal = { 
-        ...goal, 
-        saved_amount: newAmount,
-        user_id: currentUser.user_id // Add user ID manually
+      // Only send the fields that need to be updated
+      const updateData = {
+        saved_amount: newAmount
       };
       
-      // Check if goal is now complete
-      const isNowComplete = parseFloat(newAmount) >= parseFloat(goal.target_amount);
+      const isNowComplete = newAmount >= parseFloat(goal.target_amount);
       if (isNowComplete && goal.status !== 'completed') {
-        updatedGoal.status = 'completed';
+        updateData.status = 'completed';
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
       }
       
-      await axios.put(
-        `http://localhost:8800/api/saving-goals/${goal.goal_id}`,
-        updatedGoal
+      await axiosInstance.put(
+        `/api/savings/${goal.goal_id}`,
+        updateData
       );
       
       fetchGoals();
     } catch (error) {
       console.error('Error updating amount:', error);
+      alert('Error updating amount. Please try again.');
     }
   };
 
@@ -163,7 +169,7 @@ const SavingGoals = () => {
       goal_name: '',
       target_amount: '',
       saved_amount: '',
-      monthly_contribution: '', // Reset monthly contribution
+      monthly_contribution: '',
       deadline: '',
       priority: 'Medium'
     });
@@ -221,7 +227,7 @@ const SavingGoals = () => {
 
       {walletInfo && (
         <div className="wallet-info">
-          <p>Current Wallet Balance: ₹{parseFloat(walletInfo.current_balance).toLocaleString()}</p>
+          <p>Current Wallet Balance: ${parseFloat(walletInfo.balance || 0).toFixed(2)}</p>
         </div>
       )}
       
