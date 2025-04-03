@@ -62,7 +62,7 @@ const Wallet = () => {
                 // Wait a brief moment to show the success message
                 setTimeout(() => {
                     // Navigate to dashboard after successful wallet creation
-                    navigate('/');
+                    navigate('/dash');
                 }, 1500);
             } else {
                 throw new Error('Failed to create wallet');

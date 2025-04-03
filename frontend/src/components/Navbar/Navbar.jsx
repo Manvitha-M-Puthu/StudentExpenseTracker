@@ -51,7 +51,7 @@ const Navbar = () => {
   const handleLogout = async() => {
     try {
         await logout();
-        navigate("/login");
+        navigate("/");
     } catch(err) {
         console.error("Something went wrong", err);
     }
@@ -61,7 +61,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-logo">
-          <Link to="/">
+          <Link to={currentUser ? "/dash" : "/"}>
             <div className="logo"><img src={piggyPal} alt="" /></div>
           </Link>
         </div>
@@ -77,7 +77,10 @@ const Navbar = () => {
         
         {/* Desktop and mobile navigation */}
         <div className={`navbar-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-        <Link to="/wallet" className={`nav-item ${isActive('/wallet')}`} onClick={closeMobileMenu}>
+          <Link to="/dash" className={`nav-item ${isActive('/dash')}`} onClick={closeMobileMenu}>
+            Dashboard
+          </Link>
+          <Link to="/wallet" className={`nav-item ${isActive('/wallet')}`} onClick={closeMobileMenu}>
             Wallet
           </Link>
           <Link to="/transaction" className={`nav-item ${isActive('/transaction')}`} onClick={closeMobileMenu}>

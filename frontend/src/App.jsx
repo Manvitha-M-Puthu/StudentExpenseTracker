@@ -12,6 +12,7 @@ import Footer from './components/Footer/Footer';
 import Profile from './pages/Profile/Profile';
 import DebtTracker from './pages/DebtTracker/DebtTracker';
 import Dashboard from './components/Dashboard/Dashboard';
+import Landing from './pages/Landing/Landing';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import './app.css';
 
@@ -22,7 +23,9 @@ const PrivateRoute = ({ children }) => {
 };
 
 const Layout = () =>{
+    console.log("Layout component rendered");
     return(
+        
         <>
             <Navbar />
             <ErrorBoundary>
@@ -34,10 +37,11 @@ const Layout = () =>{
 }
 
 const router = createBrowserRouter([
+    {path:"/",element:<Landing />},
     {path:"/login",element:<Login />},
     {path:"/register",element:<Register />},
     {path:"/",element:<Layout />,children:[
-        {path:"/",element:<PrivateRoute><Dashboard /></PrivateRoute>},
+        {path:"/dash",element:<PrivateRoute><Dashboard /></PrivateRoute>},
         {path:"/wallet",element:<PrivateRoute><Wallet /></PrivateRoute>},
         {path:"/budget",element:<PrivateRoute><Budget /></PrivateRoute>},
         {path:"/transaction",element:<PrivateRoute><Transaction /></PrivateRoute>},

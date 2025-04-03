@@ -31,7 +31,7 @@ const Login = () => {
 
         try{
             await login(inputs);
-            navigate("/");
+            navigate("/wallet");
         }catch(err){
             console.error("Login error:", err);
             setError(err.message || "Login failed. Please check your credentials and try again.");
