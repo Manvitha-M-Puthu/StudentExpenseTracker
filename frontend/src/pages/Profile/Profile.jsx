@@ -228,11 +228,11 @@ const Profile = () => {
             <div className="wallet-balance">
               <div className="balance-item">
                 <span className="balance-label">Current Balance:</span>
-                <span className="balance-value">${Number(profile.current_balance|| 0).toFixed(2)}</span>
+                <span className="balance-value">₹{Number(profile.current_balance || 0).toFixed(2)}</span>
               </div>
               <div className="balance-item">
                 <span className="balance-label">Initial Balance:</span>
-                <span className="balance-value">${Number(profile.initial_balance||0).toFixed(2)}</span>
+                <span className="balance-value">₹{Number(profile.initial_balance || 0).toFixed(2)}</span>
               </div>
             </div>
           </div>

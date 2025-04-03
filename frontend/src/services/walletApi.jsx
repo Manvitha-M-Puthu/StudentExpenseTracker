@@ -9,8 +9,19 @@ import API from './axiosInstance';
 export const getUserWallet = async () => {
   try {
     const response = await API.get('/api/wallet/balance');
+    // Return the response even if no wallet exists
     return response.data;
   } catch (error) {
+    if (error.response?.status === 404) {
+      // Return a default structure for non-existent wallet
+      return {
+        success: true,
+        data: {
+          current_balance: 0,
+          initial_balance: 0
+        }
+      };
+    }
     console.error('Error fetching wallet:', error);
     throw error;
   }

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import * as walletApi from '../../services/walletApi';
 import './wallet.css';
 import pigSave from '../../components/Navbar/piggyPal.svg';
 
 const Wallet = () => {
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
     const [wallet, setWallet] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -23,10 +25,21 @@ const Wallet = () => {
             setLoading(true);
             setError(null);
             const response = await walletApi.getUserWallet();
-            setWallet(response.data);
+            
+            // Check if wallet exists and has any balance
+            if (!response.data || 
+                (response.data.current_balance === 0 && response.data.initial_balance === 0)) {
+                setWallet(null);
+            } else {
+                setWallet({
+                    current_balance: response.data.current_balance,
+                    initial_balance: response.data.initial_balance
+                });
+            }
         } catch (error) {
             console.error('Error fetching wallet:', error);
-            setError(error.response?.data?.message || 'Failed to fetch wallet');
+            setError('Failed to fetch wallet information. Please try again.');
+            setWallet(null);
         } finally {
             setLoading(false);
         }
@@ -37,13 +50,28 @@ const Wallet = () => {
             setLoading(true);
             setError(null);
             const response = await walletApi.createWallet(initialBalance);
-            setWallet(response.data);
-            setMessage('Wallet created successfully');
-            setMessageType('success');
+            
+            if (response.data) {
+                setWallet({
+                    current_balance: response.data.current_balance,
+                    initial_balance: response.data.initial_balance
+                });
+                setMessage('Wallet created successfully! You can now start tracking your expenses.');
+                setMessageType('success');
+                
+                // Wait a brief moment to show the success message
+                setTimeout(() => {
+                    // Navigate to dashboard after successful wallet creation
+                    navigate('/');
+                }, 1500);
+            } else {
+                throw new Error('Failed to create wallet');
+            }
         } catch (error) {
             console.error('Error creating wallet:', error);
-            setError(error.response?.data?.message || 'Failed to create wallet');
+            setError(error.response?.data?.message || 'Failed to create wallet. Please try again.');
             setMessageType('error');
+            setWallet(null); // Ensure wallet is null so the create form stays visible
         } finally {
             setLoading(false);
         }
@@ -54,7 +82,10 @@ const Wallet = () => {
             setLoading(true);
             setError(null);
             const response = await walletApi.updateWalletBalance(newBalance);
-            setWallet(response.data);
+            setWallet({
+                current_balance: response.data.current_balance,
+                initial_balance: response.data.initial_balance
+            });
             setMessage('Wallet balance updated successfully');
             setMessageType('success');
         } catch (error) {
@@ -210,7 +241,43 @@ const Wallet = () => {
                 </div>
             )}
             
-            {wallet ? (
+            {!wallet ? (
+                <div className="wallet-setup-card">
+                    <div className="wallet-welcome">
+                        <img src={pigSave} alt="Piggy Bank" className="setup-pig-icon" />
+                        <h2>Welcome! Let's Set Up Your Wallet</h2>
+                        <p>To get started with expense tracking and savings goals, please create your wallet by entering your initial balance.</p>
+                    </div>
+                    
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const initialBalance = e.target.initialBalance.value;
+                        handleCreateWallet(initialBalance);
+                    }} className="wallet-form">
+                        <div className="form-group">
+                            <label htmlFor="initialBalance">
+                                <span className="form-icon">💵</span> Initial Balance
+                            </label>
+                            <div className="amount-input-container">
+                                <span className="currency-symbol">₹</span>
+                                <input 
+                                    type="number" 
+                                    id="initialBalance" 
+                                    name="initialBalance"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    className="form-control amount-input"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <button type="submit" className="create-wallet-btn">
+                            Create My Wallet
+                        </button>
+                    </form>
+                </div>
+            ) : (
                 <main className="wallet-content">
                     <section className="wallet-details-card">
                         <div className="wallet-balance-section">
@@ -258,44 +325,6 @@ const Wallet = () => {
                         </div>
                     </section>
                 </main>
-            ) : (
-                <div className="wallet-setup-card">
-                    <div className="wallet-welcome">
-                        <img src={pigSave} alt="Piggy Bank" className="setup-pig-icon" />
-                        <h2>Welcome to Your Wallet</h2>
-                        <p>Create your wallet to start tracking your finances and manage your budget effectively.</p>
-                    </div>
-                    
-                    <form onSubmit={(e) => {
-                        e.preventDefault();
-                        const initialBalance = e.target.initialBalance.value;
-                        handleCreateWallet(initialBalance);
-                    }} className="wallet-form">
-                        <div className="form-group">
-                            <label htmlFor="initialBalance">
-                                <span className="form-icon">💵</span> Initial Balance
-                            </label>
-                            <div className="amount-input-container">
-                                <span className="currency-symbol">₹</span>
-                                <input 
-                                    type="number" 
-                                    id="initialBalance" 
-                                    name="initialBalance"
-                                    value={initialBalance} 
-                                    onChange={(e) => setInitialBalance(e.target.value)}
-                                    min="0"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                    className="form-control amount-input"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <button type="submit" className="create-wallet-btn">
-                            Create Wallet
-                        </button>
-                    </form>
-                </div>
             )}
         </div>
     );

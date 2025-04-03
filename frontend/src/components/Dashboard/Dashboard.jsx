@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, Grid, Box, CircularProgress, Alert, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Chip } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Box, CircularProgress, Alert, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Chip, Button } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import 'react-circular-progressbar/dist/styles.css';
 import './Dashboard.css';
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '../../context/AuthContext';
 
 const API_BASE_URL = 'http://localhost:8800';
 
@@ -21,7 +21,7 @@ const Dashboard = () => {
     budget: { total: 0, spent: 0, remaining: 0, progress: 0 },
     savings: { target: 0, saved: 0, progress: 0 },
     upcomingPayments: [],
-    wallet: { balance: 0 }
+    wallet: { current_balance: 0, initial_balance: 0 }
   });
 
   useEffect(() => {
@@ -30,16 +30,26 @@ const Dashboard = () => {
       return;
     }
 
-    const fetchDashboardData = async () => {
+    const checkWalletAndFetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await axios.get(`${API_BASE_URL}/api/dashboard`, {
+        // First check if wallet exists
+        const walletResponse = await axios.get(`${API_BASE_URL}/api/wallet/balance`, {
           withCredentials: true
         });
 
-        console.log('Full Dashboard Response:', JSON.stringify(response.data, null, 2));
+        // If no wallet exists, redirect to wallet page
+        if (!walletResponse.data?.data) {
+          navigate('/wallet');
+          return;
+        }
+
+        // If wallet exists, proceed with fetching dashboard data
+        const response = await axios.get(`${API_BASE_URL}/api/dashboard`, {
+          withCredentials: true
+        });
 
         if (response.data.success) {
           const {
@@ -50,34 +60,30 @@ const Dashboard = () => {
             upcomingPayments
           } = response.data.data;
 
-          console.log('Raw Budget Data:', budget);
-          console.log('Raw Savings Data:', savings);
-
-          // Validate and transform data
-          const validatedData = {
+          setDashboardData({
             wallet: {
-              balance: parseFloat(wallet?.balance || 0)
+              current_balance: walletResponse.data.data.current_balance || 0,
+              initial_balance: walletResponse.data.data.initial_balance || 0
             },
-            spendingTrends: Array.isArray(spendingTrends) ? spendingTrends : [],
+            spendingTrends: spendingTrends?.map(trend => ({
+              month: trend.month,
+              expenses: parseFloat(trend.expenses || 0),
+              income: parseFloat(trend.income || 0)
+            })) || [],
             budget: {
-              total: parseFloat(budget?.total || 0),
-              spent: parseFloat(budget?.spent || 0),
-              remaining: parseFloat(budget?.remaining || 0),
-              progress: parseFloat(budget?.progress || 0)
+              total: budget?.total || 0,
+              spent: budget?.spent || 0,
+              remaining: budget?.remaining || 0,
+              progress: budget?.progress || 0,
+              activeBudgetsCount: budget?.activeBudgetsCount || 0
             },
             savings: {
-              target: parseFloat(savings?.target || 0),
-              saved: parseFloat(savings?.saved || 0),
-              progress: parseFloat(savings?.progress || 0)
+              target: savings?.target || 0,
+              saved: savings?.saved || 0,
+              progress: savings?.progress || 0
             },
-            upcomingPayments: Array.isArray(upcomingPayments) ? upcomingPayments : []
-          };
-
-          console.log('Processed Budget Data:', validatedData.budget);
-          console.log('Processed Savings Data:', validatedData.savings);
-          console.log('Full Validated Data:', validatedData);
-          
-          setDashboardData(validatedData);
+            upcomingPayments: upcomingPayments || []
+          });
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -85,24 +91,17 @@ const Dashboard = () => {
           navigate('/login');
           return;
         }
-        
-        if (error.response) {
-          setError(`Server error: ${error.response.data?.message || 'Unknown error'}`);
-        } else if (error.request) {
-          setError('Could not connect to the server. Please check your internet connection.');
-        } else {
-          setError(error.message || 'An error occurred while setting up the request.');
-        }
+        setError('Failed to load dashboard data. Please try again.');
       } finally {
         setLoading(false);
       }
     };
 
     // Initial fetch
-    fetchDashboardData();
+    checkWalletAndFetchData();
 
-    // Set up periodic refresh (every 5 minutes)
-    const refreshInterval = setInterval(fetchDashboardData, 5 * 60 * 1000);
+    // Set up periodic refresh (every 30 seconds for testing, can be adjusted)
+    const refreshInterval = setInterval(checkWalletAndFetchData, 30 * 1000);
 
     // Cleanup interval on component unmount
     return () => clearInterval(refreshInterval);
@@ -145,6 +144,37 @@ const Dashboard = () => {
     );
   }
 
+  // Add check for no wallet
+  if (!dashboardData.wallet || (dashboardData.wallet.current_balance === 0 && dashboardData.wallet.initial_balance === 0)) {
+    return (
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        alignItems="center" 
+        justifyContent="center" 
+        minHeight="80vh"
+        p={3}
+      >
+        <Card sx={{ maxWidth: 400, width: '100%', textAlign: 'center', p: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Welcome to Your Financial Dashboard!
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph>
+            To get started with tracking your finances, you'll need to set up your wallet first.
+          </Typography>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={() => navigate('/wallet')}
+            sx={{ mt: 2 }}
+          >
+            Set Up My Wallet
+          </Button>
+        </Card>
+      </Box>
+    );
+  }
+
   return (
     <div className="dashboard">
       <Typography variant="h4" gutterBottom>
@@ -160,7 +190,7 @@ const Dashboard = () => {
                 Wallet Balance
               </Typography>
               <Typography variant="h4" className="wallet-balance">
-                {formatCurrency(dashboardData.wallet?.balance)}
+                {formatCurrency(dashboardData.wallet?.current_balance)}
               </Typography>
             </CardContent>
           </Card>

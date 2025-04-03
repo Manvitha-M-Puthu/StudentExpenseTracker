@@ -57,17 +57,17 @@ export const getAllSavingGoals = async (req, res) => {
 // Get a specific saving goal by ID
 export const getSavingGoalById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user_id = req.query.userId;
+    const { goalId } = req.params;
+    const userId = req.user.id; // Get user ID from the authenticated request
     
-    if (!user_id) {
+    if (!goalId || !userId) {
       return res.status(400).json({
         success: false,
-        message: 'User ID is required'
+        message: 'Goal ID and User ID are required'
       });
     }
     
-    const goal = await SavingGoalModel.getById(id, user_id);
+    const goal = await SavingGoalModel.getById(goalId, userId);
     
     if (!goal) {
       return res.status(404).json({ 
@@ -89,10 +89,10 @@ export const getSavingGoalById = async (req, res) => {
 // Update a saving goal
 export const updateSavingGoal = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { goalId } = req.params;
     const userId = req.user.id; // Get user ID from the authenticated request
     
-    if (!id || !userId) {
+    if (!goalId || !userId) {
       return res.status(400).json({ 
         success: false,
         message: 'Goal ID and User ID are required'
@@ -100,7 +100,8 @@ export const updateSavingGoal = async (req, res) => {
     }
 
     // Get the existing goal to use as defaults
-    const existingGoal = await SavingGoalModel.getById(id, userId);
+    const existingGoal = await SavingGoalModel.getById(goalId, userId);
+
     if (!existingGoal) {
       return res.status(404).json({ 
         success: false, 
@@ -139,7 +140,7 @@ export const updateSavingGoal = async (req, res) => {
       return res.status(200).json(existingGoal);
     }
     
-    const updatedGoal = await SavingGoalModel.update(id, goalData, userId);
+    const updatedGoal = await SavingGoalModel.update(goalId, goalData, userId);
     
     if (!updatedGoal) {
       return res.status(404).json({ 
@@ -161,17 +162,17 @@ export const updateSavingGoal = async (req, res) => {
 // Delete a saving goal
 export const deleteSavingGoal = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user_id = req.query.userId;
+    const { goalId } = req.params;
+    const userId = req.user.id; // Get user ID from the authenticated request
     
-    if (!user_id) {
+    if (!goalId || !userId) {
       return res.status(400).json({
         success: false,
-        message: 'User ID is required'
+        message: 'Goal ID and User ID are required'
       });
     }
     
-    const result = await SavingGoalModel.delete(id, user_id);
+    const result = await SavingGoalModel.delete(goalId, userId);
     
     if (!result) {
       return res.status(404).json({ 

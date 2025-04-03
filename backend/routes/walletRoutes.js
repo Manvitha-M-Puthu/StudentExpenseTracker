@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/balance', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
-        const query = 'SELECT current_balance FROM wallet WHERE user_id = ?';
+        const query = 'SELECT current_balance, initial_balance FROM wallet WHERE user_id = ?';
         
         const [result] = await db.query(query, [userId]);
         
@@ -17,7 +17,8 @@ router.get('/balance', authenticateToken, async (req, res) => {
             return res.json({
                 success: true,
                 data: {
-                    balance: 0
+                    current_balance: 0,
+                    initial_balance: 0
                 }
             });
         }
@@ -25,7 +26,8 @@ router.get('/balance', authenticateToken, async (req, res) => {
         res.json({
             success: true,
             data: {
-                balance: result[0].current_balance
+                current_balance: result[0].current_balance,
+                initial_balance: result[0].initial_balance
             }
         });
     } catch (error) {

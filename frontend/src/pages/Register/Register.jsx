@@ -32,8 +32,8 @@ const Register = () =>{
     return(
         <div className="login-container">
         <div className="login-box">
-        <div class="split-text-container">
-    <span class="text-part left">Welcome</span>
+        <div className="split-text-container">
+    <span className="text-part left">Welcome</span>
 </div>
             <p className="subtitle">Please fill in your details</p>
             <form onSubmit={handleSubmit} className="login-form">

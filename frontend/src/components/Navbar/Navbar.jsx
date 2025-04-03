@@ -77,7 +77,7 @@ const Navbar = () => {
         
         {/* Desktop and mobile navigation */}
         <div className={`navbar-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-        <Link to="/" className={`nav-item ${isActive('/')}`} onClick={closeMobileMenu}>
+        <Link to="/wallet" className={`nav-item ${isActive('/wallet')}`} onClick={closeMobileMenu}>
             Wallet
           </Link>
           <Link to="/transaction" className={`nav-item ${isActive('/transaction')}`} onClick={closeMobileMenu}>

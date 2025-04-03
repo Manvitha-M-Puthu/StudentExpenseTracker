@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../context/authContext';
+import { AuthContext } from '../../context/AuthContext';
 import axiosInstance from '../../services/axiosInstance';
 import Confetti from 'react-confetti';
 import { motion } from 'framer-motion';
@@ -66,6 +66,16 @@ const SavingGoals = () => {
     e.preventDefault();
     
     try {
+      // First check if wallet exists and has sufficient balance
+      const walletResponse = await axiosInstance.get('/api/wallet/balance');
+      const currentBalance = walletResponse.data.data?.current_balance || 0;
+      const initialSavedAmount = parseFloat(formData.saved_amount) || 0;
+
+      if (initialSavedAmount > currentBalance) {
+        alert("Your wallet balance is insufficient for the initial saved amount. Please add funds to your wallet first.");
+        return;
+      }
+
       const dataToSubmit = {
         ...formData,
         user_id: currentUser.user_id
@@ -78,12 +88,22 @@ const SavingGoals = () => {
         );
       } else {
         await axiosInstance.post('/api/savings', dataToSubmit);
+        
+        // If goal creation is successful, update wallet balance
+        if (initialSavedAmount > 0) {
+          const newWalletBalance = currentBalance - initialSavedAmount;
+          await axiosInstance.put('/api/wallet', {
+            current_balance: newWalletBalance
+          });
+          fetchWalletInfo(); // Refresh wallet info
+        }
       }
       
       resetForm();
       fetchGoals();
     } catch (error) {
       console.error('Error saving goal:', error);
+      alert('Error saving goal. Please make sure you have sufficient wallet balance.');
     }
   };
 
@@ -112,6 +132,12 @@ const SavingGoals = () => {
   const handleUpdateAmount = async (goal, amountChange) => {
     try {
       const newAmount = parseFloat(goal.saved_amount) + amountChange;
+      
+      // Prevent negative saved amounts
+      if (newAmount < 0) {
+        alert("Saved amount cannot be negative!");
+        return;
+      }
       
       if (walletInfo) {
         const currentBalance = parseFloat(walletInfo.balance || 0);
