@@ -14,10 +14,7 @@
   padding: 20px 0;
 }
 
-.logo {
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background: white;
+.landing-logo {
   padding: 10px;
   transition: transform 0.3s ease;
 }
@@ -76,12 +73,16 @@
 }
 
 .piggy-icon {
-  font-size: 4rem;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  
 }
-
+.piggy-icon img {
+  width: 100px;
+  height: auto;
+  animation: bounce 2s infinite;
+}
 .bounce {
   animation: bounce 2s infinite;
 }

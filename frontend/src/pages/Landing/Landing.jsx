@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './landing.css'; 
 import piggyPal from './piggyPal.svg';
-import cash from './cashmoney.svg';
+
 
 console.log("Landing component rendered");
 
@@ -16,17 +16,11 @@ const Landing = () => {
         <div className="landing-container">
             <div className="hero-section">
                 <div className="logo-container">
-                    <div className="piggy-icon bounce logo"><img src={piggyPal} alt="" /></div>
+                    <div className="piggy-icon bounce landing-logo"><img src={piggyPal} alt="" /></div>
                 </div>
                 
                 <div className="hero-content">
                     <div className="piggy-animation">
-                    <div className="coin coin-2">
-                    💸
-</div>
-
-                        <div className="coin coin-1">💸</div>
-                        <div className="coin coin-3">💸</div>
                      
                     </div>
                     
