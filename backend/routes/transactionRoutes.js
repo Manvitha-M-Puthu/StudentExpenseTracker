@@ -6,6 +6,7 @@ import {
   updateTransactionHandler,
   deleteTransactionHandler,
   getBudgetSummaryHandler,
+  getRecentTransactionsHandler
 } from "../controllers/transactionController.js";
 import { authenticateToken } from '../middleware/auth.js';
 import db from '../utils/db.js';
@@ -60,5 +61,8 @@ router.get('/monthly', authenticateToken, async (req, res) => {
         });
     }
 });
+
+// Get recent transactions
+router.get('/recent', authenticateToken, getRecentTransactionsHandler);
 
 export default router;

@@ -84,7 +84,7 @@ export const createBudgetHandler = async (req, res) => {
       endDate,
     });
 
-    console.log('Budget created successfully with ID:', budgetId);
+    
 
     // Verify the budget was created
     const [verifyBudget] = await db.query(
@@ -95,7 +95,7 @@ export const createBudgetHandler = async (req, res) => {
       [budgetId, userId]
     );
 
-    console.log('Verified budget data:', verifyBudget[0]);
+    
 
     res.status(201).json({
       success: true,

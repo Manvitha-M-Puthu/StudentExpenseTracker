@@ -78,10 +78,36 @@ export const updateWalletHandler = async (req, res) => {
             });
         }
 
-        const updatedWallet = await updateWallet(userId, current_balance);
+        // Ensure the new balance is a valid number
+        const newBalance = parseFloat(current_balance);
+        if (isNaN(newBalance)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid balance amount"
+            });
+        }
+
+        // Prevent negative balance
+        if (newBalance < 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Balance cannot be negative"
+            });
+        }
+
+        // Update the wallet with the new balance
+        const updatedWallet = await updateWallet(userId, newBalance);
+        
+        if (!updatedWallet) {
+            throw new Error("Failed to update wallet");
+        }
+
         return res.status(200).json({
             success: true,
-            data: updatedWallet
+            data: {
+                current_balance: parseFloat(updatedWallet.current_balance),
+                initial_balance: parseFloat(updatedWallet.initial_balance)
+            }
         });
     } catch (error) {
         console.error("Error updating wallet:", error);

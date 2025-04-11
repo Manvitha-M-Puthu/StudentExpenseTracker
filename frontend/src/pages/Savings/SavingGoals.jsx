@@ -33,9 +33,14 @@ const SavingGoals = () => {
   const fetchWalletInfo = async () => {
     try {
       const response = await axiosInstance.get('/api/wallet/balance');
-      setWalletInfo({
-        balance: response.data.data?.balance || 0
-      });
+      if (response.data?.success && response.data?.data) {
+        const currentBalance = parseFloat(response.data.data.current_balance);
+        setWalletInfo({
+          balance: isNaN(currentBalance) ? 0 : currentBalance
+        });
+      } else {
+        setWalletInfo({ balance: 0 });
+      }
     } catch (error) {
       console.error('Error fetching wallet info:', error);
       setWalletInfo({ balance: 0 });
@@ -139,34 +144,38 @@ const SavingGoals = () => {
         return;
       }
       
-      if (walletInfo) {
-        const currentBalance = parseFloat(walletInfo.balance || 0);
-        const newWalletBalance = currentBalance - amountChange;
-        
-        if (newWalletBalance < 0 && amountChange > 0) {
-          alert("Insufficient wallet balance!");
-          return;
-        }
-        
-        // First, ensure wallet exists
-        try {
-          await axiosInstance.get('/api/wallet/balance');
-        } catch (error) {
-          // If wallet doesn't exist, create it
-          await axiosInstance.post('/api/wallet', {
-            initial_balance: currentBalance
-          });
-        }
-        
-        // Now update the wallet balance
-        await axiosInstance.put('/api/wallet', {
-          current_balance: newWalletBalance
-        });
-        
-        fetchWalletInfo();
+      // Fetch latest wallet balance
+      const walletResponse = await axiosInstance.get('/api/wallet/balance');
+      if (!walletResponse.data?.success || !walletResponse.data?.data) {
+        alert("Error fetching wallet balance. Please try again.");
+        return;
+      }
+
+      const currentBalance = parseFloat(walletResponse.data.data.current_balance);
+      if (isNaN(currentBalance)) {
+        alert("Invalid wallet balance. Please try again.");
+        return;
       }
       
-      // Only send the fields that need to be updated
+      // For adding money to savings
+      if (amountChange > 0 && currentBalance < amountChange) {
+        alert(`Insufficient wallet balance! Current balance: ${formatCurrency(currentBalance)}`);
+        return;
+      }
+      
+      // Calculate new wallet balance
+      const newWalletBalance = currentBalance - amountChange;
+      
+      // Update the wallet balance
+      const updateResponse = await axiosInstance.put('/api/wallet', {
+        current_balance: newWalletBalance
+      });
+
+      if (!updateResponse.data?.success) {
+        throw new Error("Failed to update wallet balance");
+      }
+      
+      // Update the savings goal
       const updateData = {
         saved_amount: newAmount
       };
@@ -178,12 +187,20 @@ const SavingGoals = () => {
         setTimeout(() => setShowConfetti(false), 5000);
       }
       
-      await axiosInstance.put(
+      const goalUpdateResponse = await axiosInstance.put(
         `/api/savings/${goal.goal_id}`,
         updateData
       );
+
+      if (!goalUpdateResponse.data?.success) {
+        throw new Error("Failed to update savings goal");
+      }
       
-      fetchGoals();
+      // Refresh both wallet and goals data
+      await Promise.all([
+        fetchWalletInfo(),
+        fetchGoals()
+      ]);
     } catch (error) {
       console.error('Error updating amount:', error);
       alert('Error updating amount. Please try again.');

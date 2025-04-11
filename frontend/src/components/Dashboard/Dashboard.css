@@ -1,31 +1,48 @@
 .dashboard {
-  padding: 20px;
-  background-color: #f5f5f5;
+  padding: 24px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
   min-height: 100vh;
 }
 
 .dashboard .MuiCard-root {
   height: 100%;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  background-color: #ffffff;
-  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .dashboard .MuiCard-root:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .dashboard .MuiTypography-h4 {
-  margin-bottom: 30px;
+  margin-bottom: 32px;
   color: #2c3e50;
-  font-weight: 600;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard .MuiTypography-h6 {
   color: #34495e;
-  font-weight: 500;
-  margin-bottom: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.dashboard .MuiTypography-h6::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #2196f3, #4caf50);
+  border-radius: 2px;
 }
 
 .dashboard .MuiCardContent-root {
@@ -58,43 +75,129 @@
   margin-bottom: 8px;
 }
 
-.dashboard .wallet-balance {
+/* Wallet Balance Card */
+.wallet-balance {
   font-size: 2rem;
-  font-weight: 600;
-  color: #3498db;
+  font-weight: 700;
+  color: #2196f3;
+  text-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+  margin: 8px 0;
+  transition: all 0.3s ease;
 }
 
-/* Responsive adjustments */
+.wallet-balance:hover {
+  transform: scale(1.02);
+}
+
+/* Progress Cards */
+.progress-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  z-index: 1;
+}
+
+.progress-card .CircularProgressbar {
+  width: 100%;
+  height: 100%;
+  transition: all 0.5s ease;
+}
+
+.progress-card:hover .CircularProgressbar {
+  transform: scale(1.05);
+}
+
+.progress-card .CircularProgressbar .CircularProgressbar-text {
+  fill: #2c3e50;
+  font-size: 20px;
+  font-weight: bold;
+  dominant-baseline: middle;
+  text-anchor: middle;
+}
+
+/* Chart Styling */
+.dashboard .recharts-wrapper {
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+.dashboard .recharts-wrapper:hover {
+  transform: scale(1.02);
+}
+
+.dashboard .recharts-surface {
+  overflow: visible;
+}
+
+.dashboard .recharts-tooltip-wrapper {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  padding: 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Table Styling */
+.dashboard .MuiTable-root {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dashboard .MuiTableHead-root {
+  background: linear-gradient(45deg, #2196f3, #4caf50);
+}
+
+.dashboard .MuiTableHead-root .MuiTableCell-head {
+  color: white;
+  font-weight: 600;
+}
+
+.dashboard .MuiTableBody-root .MuiTableRow-root:hover {
+  background: rgba(33, 150, 243, 0.05);
+}
+
+/* Responsive Design */
 @media (max-width: 960px) {
   .dashboard {
-    padding: 10px;
+    padding: 16px;
   }
 
   .dashboard .MuiCard-root {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   .dashboard .MuiTypography-h4 {
     font-size: 1.75rem;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
-  .dashboard .MuiTypography-h6 {
-    font-size: 1.1rem;
+  .wallet-balance {
+    font-size: 1.75rem;
   }
 
-  .progress-card {
-    margin-bottom: 20px;
-  }
-  
-  .budget-detail, .savings-detail {
-    font-size: 0.9rem;
+  .quick-actions-card .MuiButton-root {
+    padding: 8px;
+    font-size: 0.875rem;
   }
 }
 
 @media (max-width: 600px) {
+  .dashboard {
+    padding: 12px;
+  }
+
   .dashboard .MuiCard-root {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
 
   .dashboard .MuiCardContent-root {
@@ -103,21 +206,21 @@
 
   .dashboard .MuiTypography-h4 {
     font-size: 1.5rem;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
-  .dashboard .wallet-balance {
+  .wallet-balance {
     font-size: 1.5rem;
   }
-}
 
-/* Chart Responsiveness */
-.dashboard .recharts-wrapper {
-  margin: 0 auto;
-}
+  .quick-actions-card .MuiButton-root {
+    padding: 6px;
+    font-size: 0.75rem;
+  }
 
-.dashboard .recharts-surface {
-  overflow: visible;
+  .recent-transactions-card .MuiListItemText-primary {
+    font-size: 0.875rem;
+  }
 }
 
 /* Loading State */
@@ -126,45 +229,38 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Card Content Spacing */
 .dashboard .card-content-spacing {
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 /* Progress Indicators */
 .dashboard .progress-label {
-  margin-top: 8px;
+  margin-top: 12px;
   text-align: center;
   color: #7f8c8d;
+  font-weight: 500;
 }
 
-/* Tooltip Styling */
-.dashboard .recharts-tooltip-wrapper {
-  background-color: rgba(255, 255, 255, 0.96);
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-}
-
-.progress-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.progress-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-}
-
+/* Budget and Savings Details */
 .budget-detail, .savings-detail {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.budget-detail:hover, .savings-detail:hover {
+  background: rgba(33, 150, 243, 0.05);
+  border-radius: 8px;
+  padding: 12px 16px;
 }
 
 .budget-detail:last-child, .savings-detail:last-child {
@@ -173,14 +269,9 @@
 
 .label {
   font-weight: 600;
-  color: #666;
+  color: #34495e;
   min-width: 100px;
   text-align: left;
-}
-
-.wallet-balance {
-  color: #4caf50;
-  font-weight: 600;
 }
 
 /* Progress bar colors */
@@ -206,4 +297,75 @@
 
 .savings-progress.success {
   --progress-color: #4caf50;
+}
+
+/* Welcome Card for New Users */
+.welcome-card {
+  background: linear-gradient(135deg, #2196f3, #4caf50);
+  color: white;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(33, 150, 243, 0.2);
+}
+
+.welcome-card .MuiTypography-h5 {
+  color: white;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.welcome-card .MuiTypography-body1 {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 24px;
+}
+
+.welcome-card .MuiButton-root {
+  background: white;
+  color: #2196f3;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.welcome-card .MuiButton-root:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Quick Actions Card */
+.quick-actions-card .MuiButton-root {
+  margin: 4px 0;
+  transition: all 0.3s ease;
+}
+
+.quick-actions-card .MuiButton-root:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Recent Transactions Card */
+.recent-transactions-card .MuiListItemButton-root {
+  border-radius: 8px;
+  margin: 4px 0;
+  transition: all 0.3s ease;
+}
+
+.recent-transactions-card .MuiListItemButton-root:hover {
+  background-color: rgba(33, 150, 243, 0.05);
+}
+
+.recent-transactions-card .MuiListItemIcon-root {
+  min-width: 40px;
+}
+
+.recent-transactions-card .MuiListItemText-primary {
+  font-weight: 500;
+}
+
+.recent-transactions-card .MuiListItemText-secondary {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.875rem;
 } 

@@ -19,10 +19,6 @@ export const getDashboardData = async (req, res) => {
             WHERE b.user_id = ?
         `, [userId]);
 
-        console.log('Debug - All Budgets in Database:', allBudgets);
-        console.log('Debug - Current User ID:', userId);
-        console.log('Debug - Current Date:', new Date().toISOString());
-
         // Get wallet balance
         const walletQuery = `
             SELECT current_balance
@@ -94,18 +90,7 @@ export const getDashboardData = async (req, res) => {
             [userId]
         );
 
-        console.log('Budget Debug Info:');
-        console.log('User ID:', userId);
-        console.log('Current Date:', new Date().toISOString().split('T')[0]);
-        console.log('Active Budgets:', budgetProgress[0].active_budgets_count);
-        console.log('Expired Budgets:', budgetProgress[0].expired_budgets_count);
-        console.log('Future Budgets:', budgetProgress[0].future_budgets_count);
-        console.log('\nBudget Details:');
-        console.log(budgetProgress[0].budget_details);
-        console.log('\nCalculated Totals:');
-        console.log('Total Budget:', budgetProgress[0].total_budget);
-        console.log('Total Spent:', budgetProgress[0].total_spent);
-        console.log('Total Remaining:', budgetProgress[0].total_remaining);
+
 
         // Debug query to check all budgets regardless of status
         const [budgetDebug] = await db.query(`
@@ -134,8 +119,6 @@ export const getDashboardData = async (req, res) => {
             WHERE b.user_id = ?
         `, [userId]);
 
-        console.log('\nAll Budgets in Database:');
-        console.log(JSON.stringify(budgetDebug, null, 2));
 
         // Get savings progress
         const savingsProgressQuery = `
@@ -174,40 +157,17 @@ export const getDashboardData = async (req, res) => {
         const [savingsProgress] = await db.query(savingsProgressQuery, [userId]);
         const [upcomingPayments] = await db.query(upcomingPaymentsQuery, [userId]);
 
-        console.log('Raw Data:');
-        console.log('Wallet Result:', walletResult);
-        console.log('Spending Trends:', spendingTrends);
-        console.log('Raw Budget Data:', {
-            budgetProgress: budgetProgress[0],
-            activeBudgetsCount: budgetProgress[0]?.active_budgets_count || 0
-        });
-        console.log('Savings Progress:', savingsProgress);
-        console.log('Upcoming Payments:', upcomingPayments);
-
         // Calculate budget progress
         const totalBudget = parseFloat(budgetProgress[0]?.total_budget || 0);
         const remainingAmount = parseFloat(budgetProgress[0]?.total_remaining || 0);
         const totalSpent = parseFloat(budgetProgress[0]?.total_spent || 0);
         const budgetProgressPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
-        console.log('Budget Calculation:', {
-            totalBudget,
-            totalSpent,
-            remainingAmount,
-            budgetProgress: budgetProgressPercentage,
-            activeBudgetsCount: budgetProgress[0]?.active_budgets_count || 0
-        });
-
         // Calculate savings progress
         const totalTarget = parseFloat(savingsProgress[0]?.total_target || 0);
         const totalSaved = parseFloat(savingsProgress[0]?.total_saved || 0);
         const savingsProgressPercentage = parseFloat(savingsProgress[0]?.progress || 0);
 
-        console.log('Savings Calculation Details:', {
-            totalTarget,
-            totalSaved,
-            savingsProgress: savingsProgressPercentage
-        });
 
         // Prepare response
         const responseData = {
@@ -242,7 +202,6 @@ export const getDashboardData = async (req, res) => {
             }
         };
 
-        console.log('Final Response Data:', JSON.stringify(responseData, null, 2));
         res.json(responseData);
     } catch (error) {
         console.error('Error fetching dashboard data:', error);

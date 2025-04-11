@@ -408,3 +408,42 @@ export const getTransactionsByUserId = async (userId) => {
     throw error;
   }
 };
+
+export const getRecentTransactions = async (userId) => {
+  try {
+    const query = `
+      SELECT 
+        t.transaction_id as id,
+        t.amount,
+        t.transaction_type as type,
+        t.description,
+        DATE_FORMAT(t.transaction_date, '%Y-%m-%d') as date,
+        c.category_name as category
+      FROM transactions t
+      LEFT JOIN categories c ON t.category_id = c.category_id
+      WHERE t.user_id = ?
+      ORDER BY t.transaction_date DESC
+      LIMIT 5
+    `;
+
+    const [rows] = await db.query(query, [userId]);
+    
+    // If no transactions found, return empty array
+    if (!rows || rows.length === 0) {
+      return [];
+    }
+
+    // Format the response to match what the frontend expects
+    return rows.map(row => ({
+      id: row.id,
+      amount: parseFloat(row.amount),
+      type: row.type,
+      description: row.description,
+      date: row.date,
+      category: row.category
+    }));
+  } catch (error) {
+    console.error('Error in getRecentTransactions:', error);
+    throw error;
+  }
+};
